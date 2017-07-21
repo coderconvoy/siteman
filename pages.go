@@ -19,6 +19,7 @@ func IndexPage() *htmq.Tag {
 }
 
 func HomePage() *htmq.Tag {
-	p, b := htmq.NewPage("Home")
+	p, _ := htmq.NewPage("Home")
 
+	return p
 }

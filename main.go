@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -17,9 +18,14 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	usr := flag.Bool("usr", false, "Create or Edit a User")
 
-	http.HandleFunc("/login", HandleLogin)
-	http.HandleFunc("/", Handle)
+	flag.Parse()
+
+	if *usr {
+		RunUserFunc("test_data/out/ulist")
+		return
+	}
 
 	fmt.Println("Starting Server")
 

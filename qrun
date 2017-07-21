@@ -1,0 +1,16 @@
+
+go build 2>&1 | 
+
+if read line 
+then
+    echo $line
+    while read line 
+    do
+        echo $line
+    done
+else
+    echo "No BUILD ERRORS"
+    ./siteman "$@" 
+fi
+
+

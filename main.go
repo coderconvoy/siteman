@@ -5,13 +5,32 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
+	"github.com/coderconvoy/dbase"
 	"github.com/coderconvoy/siteman/usr"
 )
 
-func HandleLogin(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Login")
+func LoginHandler(sc *dbase.SessionControl, uu []usr.Usr) MuxFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		//Check for match
+		found := -1
+		for k, v := range uu {
+			if v.Username == r.FormValue("username") && v.Password.Check(r.FormValue("password")) {
+				found = k
+				break
+			}
+		}
+		if found == -1 {
+			//TODO Add Message somewhere
+			http.Redirect(w, r, "/", 303)
+			return
+		}
+		//Add to sessioncontrol
+		//point to home
 
+		fmt.Fprintln(w, "Login")
+	}
 }
 
 func Handle(w http.ResponseWriter, r *http.Request) {
@@ -36,6 +55,7 @@ func main() {
 		return
 	}
 
+	sesh := dbase.NewSessionControl(time.Minute * 15)
 	_ = users
 
 	http.HandleFunc("/login", HandleLogin)

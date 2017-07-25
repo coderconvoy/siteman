@@ -11,7 +11,7 @@ import (
 	"github.com/coderconvoy/siteman/usr"
 )
 
-func LoginHandler(sc *dbase.SessionControl, uu []usr.Usr) MuxFunc {
+func LoginHandler(uu []usr.Usr, sc *dbase.SessionControl) MuxFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		//Check for match
 		found := -1
@@ -26,10 +26,11 @@ func LoginHandler(sc *dbase.SessionControl, uu []usr.Usr) MuxFunc {
 			http.Redirect(w, r, "/", 303)
 			return
 		}
+		sc.Login(w, uu[found])
 		//Add to sessioncontrol
 		//point to home
+		http.Redirect(w, r, "/home", 303)
 
-		fmt.Fprintln(w, "Login")
 	}
 }
 
@@ -56,9 +57,9 @@ func main() {
 	}
 
 	sesh := dbase.NewSessionControl(time.Minute * 15)
-	_ = users
 
-	http.HandleFunc("/login", HandleLogin)
+	http.HandleFunc("/home", NewHandler(users, sesh, HandleView))
+	http.HandleFunc("/login", LoginHandler(users, sesh))
 	http.HandleFunc("/", Handle)
 
 	fmt.Println("Starting Server")

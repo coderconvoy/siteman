@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+
+	"github.com/coderconvoy/siteman/usr"
 )
 
 func HandleLogin(w http.ResponseWriter, r *http.Request) {
@@ -18,14 +20,26 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	usr := flag.Bool("usr", false, "Create or Edit a User")
+	usrn := flag.Bool("usr", false, "Create or Edit a User")
+	usrf := flag.String("usrf", "usrdata.json", "Set Userdata file")
 
 	flag.Parse()
 
-	if *usr {
-		RunUserFunc("test_data/out/ulist")
+	if *usrn {
+		usr.RunUserFunc(*usrf)
 		return
 	}
+
+	users, err := usr.LoadUsers(*usrf)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	_ = users
+
+	http.HandleFunc("/login", HandleLogin)
+	http.HandleFunc("/", Handle)
 
 	fmt.Println("Starting Server")
 

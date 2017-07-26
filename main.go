@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/coderconvoy/dbase"
+	"github.com/coderconvoy/gojs"
 	"github.com/coderconvoy/siteman/usr"
 )
 
@@ -58,6 +59,7 @@ func main() {
 
 	sesh := dbase.NewSessionControl(time.Minute * 15)
 
+	http.HandleFunc("/ass/", gojs.AssetHandler("/ass/", nil))
 	http.HandleFunc("/home", NewHandler(users, sesh, HomeView))
 	http.HandleFunc("/login", LoginHandler(users, sesh))
 	http.HandleFunc("/usr/", NewHandler(users, sesh, FileGetter))

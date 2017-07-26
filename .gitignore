@@ -3,3 +3,4 @@
 siteman
 userdata.json
 test_data/site/*
+bindata.go

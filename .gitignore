@@ -2,3 +2,4 @@
 *.swo
 siteman
 userdata.json
+test_data/site/*

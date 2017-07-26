@@ -59,7 +59,9 @@ func main() {
 
 	sesh := dbase.NewSessionControl(time.Minute * 15)
 
-	http.HandleFunc("/ass/", gojs.AssetHandler("/ass/", nil))
+	gojs.Single.AddFuncs(Asset, AssetDir)
+
+	http.HandleFunc("/ass/", gojs.AssetHandler("/ass/", gojs.Single))
 	http.HandleFunc("/home", NewHandler(users, sesh, HomeView))
 	http.HandleFunc("/login", LoginHandler(users, sesh))
 	http.HandleFunc("/usr/", NewHandler(users, sesh, FileGetter))

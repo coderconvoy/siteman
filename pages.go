@@ -17,9 +17,3 @@ func IndexPage() *htmq.Tag {
 	b.AddChildren(f)
 	return p
 }
-
-func HomePage() *htmq.Tag {
-	p, _ := htmq.NewPage("Home")
-
-	return p
-}

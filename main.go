@@ -58,8 +58,9 @@ func main() {
 
 	sesh := dbase.NewSessionControl(time.Minute * 15)
 
-	http.HandleFunc("/home", NewHandler(users, sesh, HandleView))
+	http.HandleFunc("/home", NewHandler(users, sesh, HomeView))
 	http.HandleFunc("/login", LoginHandler(users, sesh))
+	http.HandleFunc("/usr/", NewHandler(users, sesh, FileGetter))
 	http.HandleFunc("/", Handle)
 
 	fmt.Println("Starting Server")

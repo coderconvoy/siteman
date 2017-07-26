@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path"
+	"path/filepath"
 	"strings"
 
 	"github.com/coderconvoy/dbase"
@@ -134,7 +135,8 @@ func RunUserFunc(fname string) {
 
 func LoadUsers(fname string) ([]Usr, error) {
 	uu, err := ReadUsers(fname)
-	return absPath(uu, fname), err
+	fpath := filepath.Dir(fname)
+	return absPath(uu, fpath), err
 }
 
 func ReadUsers(fname string) ([]Usr, error) {

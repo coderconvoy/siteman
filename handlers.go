@@ -28,7 +28,7 @@ func NewHandler(u []usr.Usr, sc *dbase.SessionControl, f UHandleFunc) MuxFunc {
 }
 
 func HomeView(u usr.Usr, w http.ResponseWriter, r *http.Request) {
-	p, b := htmq.NewPage("Home")
+	p, b := htmq.NewPage("Home", "", "ass/js.fold.js")
 	fv, err := FileView(u.Root, "", 4)
 	if err != nil {
 		b.AddChildren(htmq.NewText("Cannot read home directory: " + err.Error()))

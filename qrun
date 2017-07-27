@@ -1,5 +1,5 @@
 
-go-bindata assets/...
+go-bindata -debug assets/...
 go build 2>&1 | 
 
 if read line 

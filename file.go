@@ -51,3 +51,18 @@ func FileGetter(u usr.Usr, w http.ResponseWriter, r *http.Request) {
 	}
 	w.Write(cc)
 }
+
+func FileSaver(u usr.Usr, w http.ResponseWriter, r *http.Request) {
+	p := strings.TrimSpace(r.FormValue("fname"))
+	if p == "" {
+		http.Error(w, "No Filename given", 400)
+		return
+	}
+	p2, err := u.ConvertPath(p)
+	if err != nil {
+		http.Error(w, "Could not write file: "+err.Error(), 400)
+		return
+	}
+	ioutil.WriteFile(p2, []byte(r.FormValue("fcontents")), 0777)
+	return
+}

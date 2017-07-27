@@ -1,0 +1,9 @@
+#treetop {
+    float:left;
+    min-width:300px;
+}
+
+textarea {
+    width:500px;
+    height:80vh;
+}

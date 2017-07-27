@@ -28,13 +28,19 @@ func NewHandler(u []usr.Usr, sc *dbase.SessionControl, f UHandleFunc) MuxFunc {
 }
 
 func HomeView(u usr.Usr, w http.ResponseWriter, r *http.Request) {
-	p, b := htmq.NewPage("Home", "", "https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js,ass/js/fold.js")
+	p, b := htmq.NewPage("Home", "/ass/css/main.css", "https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js,/ass/js/fold.js")
 	fv, err := FileView(u.Root, "", 4)
 	if err != nil {
 		b.AddChildren(htmq.NewText("Cannot read home directory: " + err.Error()))
 	}
-	b.AddChildren(fv)
-	b.AddChildren(htmq.NewTag("textarea", "id", "filebox"))
+
+	fv.AddAttrs("id", "treetop")
+	tdiv := htmq.NewParent("div", []*htmq.Tag{
+		htmq.NewTag("textarea", "id", "filebox"),
+		htmq.QBut("Save", "save()"),
+	})
+
+	b.AddChildren(fv, tdiv)
 
 	b.AddChildren(htmq.QScript("foldStart();"))
 

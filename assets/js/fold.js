@@ -1,17 +1,19 @@
 function fold(caller){
-    console.log(caller);
     var sib = caller.nextElementSibling
     console.log("sib ==", sib)
 
-    if (sib.style.visibilty !== "hidden") {
-        sib.style.visibility = "hidden";
+    if (sib.style.display !== "none") {
+        sib.style.display = "none";
     }else {
         sib.style.display = "";
     }
 }
 
+foldns = { };
+
 function showFile(fname,caller){
     var box = document.getElementById("filebox");
+    foldns.fname = fname;
     $.get("/usr/"+fname,function(res){
         box.value = res ;
     });
@@ -21,8 +23,21 @@ function showFile(fname,caller){
 
 
 function foldStart(){
-    showFile("Hello Yall");
     console.log("Hello fold starter");
+}
+
+function save(){
+    var fbox = document.getElementById("filebox");
+    $.ajax({
+        url:"/save",
+        type:"POST",
+        data:{
+            fname:foldns.fname,
+            fcontents:fbox.value
+        },
+        success:function(){
+        }
+    });
 }
 
 

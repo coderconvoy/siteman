@@ -35,12 +35,18 @@ func HomeView(u usr.Usr, w http.ResponseWriter, r *http.Request) {
 	}
 
 	fv.AddAttrs("id", "treetop")
+	loc := htmq.NewTextTag("p", "", "id", "loc-p")
 	tdiv := htmq.NewParent("div", []*htmq.Tag{
 		htmq.NewTag("textarea", "id", "filebox"),
 		htmq.QBut("Save", "save()"),
-	})
+	}, "id", "filediv")
+	foldiv := htmq.NewParent("div", []*htmq.Tag{
 
-	b.AddChildren(fv, tdiv)
+		htmq.QInput("text", "filename", "id", "foltext"),
+		htmq.QBut("Add File", "addFile(this)"),
+	}, "id", "foldiv", "style", "display:none;")
+
+	b.AddChildren(fv, loc, tdiv, foldiv)
 
 	b.AddChildren(htmq.QScript("foldStart();"))
 

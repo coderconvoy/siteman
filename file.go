@@ -24,8 +24,10 @@ func FileView(root, lpath string, md int) (*htmq.Tag, error) {
 	chids := []*htmq.Tag{}
 	for _, v := range dir {
 		if v.IsDir() && md > 0 {
-			chids = append(chids, htmq.NewTextTag("li", v.Name(), "onclick", "fold(this)"))
-			inner, e2 := FileView(root, path.Join(lpath, v.Name()), md-1)
+			dp := path.Join(lpath, v.Name())
+			chids = append(chids, htmq.NewTextTag("li", v.Name(), "onclick", "fold(this,'"+dp+"')", "class", "treefolder"))
+			inner, e2 := FileView(root, dp, md-1)
+			inner.AddAttrs("style", "display:none;")
 			if e2 != nil {
 				err = e2
 			}

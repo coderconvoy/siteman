@@ -3,6 +3,11 @@
     min-width:300px;
 }
 
+.treefolder{
+    color:red;
+}
+
+
 textarea {
     width:500px;
     height:80vh;

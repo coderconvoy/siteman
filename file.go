@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"path"
 	"strings"
 
@@ -34,7 +35,7 @@ func FileView(root, lpath string, md int) (*htmq.Tag, error) {
 			chids = append(chids, inner)
 			continue
 		}
-		chids = append(chids, htmq.NewTextTag("li", v.Name(), "onclick", "showFile('"+path.Join(lpath, v.Name())+"')"))
+		chids = append(chids, htmq.NewTextTag("li", v.Name(), "onclick", "showFile('"+path.Join(lpath, v.Name())+"',this)", "class", "treefile"))
 	}
 	return htmq.NewParent("ul", chids), err
 }
@@ -67,4 +68,23 @@ func FileSaver(u usr.Usr, w http.ResponseWriter, r *http.Request) {
 	}
 	ioutil.WriteFile(p2, []byte(r.FormValue("fcontents")), 0777)
 	return
+}
+
+func FileDeleter(u usr.Usr, w http.ResponseWriter, r *http.Request) {
+	p := strings.TrimSpace(r.FormValue("fname"))
+	if p == "" {
+		http.Error(w, "No Filename given", 400)
+		return
+	}
+	p2, err := u.ConvertPath(p)
+	if err != nil {
+		http.Error(w, "Could not Delete File: "+err.Error(), 400)
+		return
+	}
+	err = os.Remove(p2)
+	if err != nil {
+		http.Error(w, "Could not Delete File: "+err.Error(), 400)
+	}
+	return
+
 }

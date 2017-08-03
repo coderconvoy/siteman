@@ -5,6 +5,11 @@
 
 .treefolder{
     color:red;
+    cursor:pointer;
+}
+
+.treefile{
+    cursor:pointer;
 }
 
 

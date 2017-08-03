@@ -11,16 +11,16 @@ function setPath(p,treepos){
 function fold(caller,path){
     document.getElementById("foldiv").style.display = "";
     document.getElementById("filediv").style.display = "none";
-    setPath(path,caller);
 
     var sib = caller.nextElementSibling;
     console.log("sib ==", sib)
 
-    if (sib.style.display !== "none") {
+    if (sib.style.display !== "none" && foldns.treepos === caller) {
         sib.style.display = "none";
     }else {
         sib.style.display = "";
     }
+    setPath(path,caller);
 }
 
 
@@ -57,7 +57,7 @@ function save(){
 function addFile(caller){ 
     
     var filename = document.getElementById("foltext").value;
-    fullname = foldns.fname + "/" + filename
+    var fullname = foldns.fname + "/" + filename
     $.ajax({
         url:"/save",
         type:"POST",
@@ -72,6 +72,7 @@ function addFile(caller){
                 nleaf.onclick = function(){
                     showFile(fullname,this);
                 }
+                nleaf.className = "treefile";
                 foldns.treepos.nextElementSibling.appendChild(nleaf);
 
             }else {
@@ -82,6 +83,26 @@ function addFile(caller){
 
         }
     });
+}
+
+function deleteFile(caller){
+    if (!  confirm("Are you sure you want to delete " + foldns.fname+ "?")){
+        return
+    }
+
+    $.ajax({
+        url:"/delete",
+        type:"POST",
+        data:{
+            fname:foldns.fname,
+        },
+        success:function(){
+            console.log("Deleting : ", foldns.treepos);
+            foldns.treepos.remove();
+        }
+
+    });
+
 }
 
 

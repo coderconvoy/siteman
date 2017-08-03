@@ -62,6 +62,7 @@ func main() {
 	gojs.Single.AddFuncs(Asset, AssetDir)
 
 	http.HandleFunc("/save", NewHandler(users, sesh, FileSaver))
+	http.HandleFunc("/delete", NewHandler(users, sesh, FileDeleter))
 	http.HandleFunc("/ass/", gojs.AssetHandler("/ass/", gojs.Single))
 	http.HandleFunc("/home", NewHandler(users, sesh, HomeView))
 	http.HandleFunc("/login", LoginHandler(users, sesh))

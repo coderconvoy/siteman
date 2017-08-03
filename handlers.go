@@ -38,7 +38,9 @@ func HomeView(u usr.Usr, w http.ResponseWriter, r *http.Request) {
 	loc := htmq.NewTextTag("p", "", "id", "loc-p")
 	tdiv := htmq.NewParent("div", []*htmq.Tag{
 		htmq.NewTag("textarea", "id", "filebox"),
-		htmq.QBut("Save", "save()"),
+		htmq.NewText("<br>"),
+		htmq.QBut("Delete", "deleteFile(this)"),
+		htmq.QBut("Save", "save(this)"),
 	}, "id", "filediv")
 	foldiv := htmq.NewParent("div", []*htmq.Tag{
 

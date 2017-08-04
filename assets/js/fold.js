@@ -40,7 +40,7 @@ function foldStart(){
     console.log("Hello fold starter");
 }
 
-function save(){
+function saveFile(){
     var fbox = document.getElementById("filebox");
     $.ajax({
         url:"/save",
@@ -104,5 +104,52 @@ function deleteFile(caller){
     });
 
 }
+
+function selectFile(){
+    var els = document.getElementsByClassName("with_select");
+    for (el in els){
+        if (els[el].classList) {
+        els[el].classList.remove("hidden");
+        }else {
+            console.log("withselect no classlist : ",els[el]);
+        }
+    }
+    foldns.selectfname = foldns.fname;
+    foldns.selectpos = foldns.treepos;
+
+}
+
+function descend(path){
+    var root = document.getElementById("treetop");
+    console.log("root",root)
+    var curr = root;
+    bigloop:
+    while (true){
+        var cn = curr.children;
+        for ( var i = 0; i < cn.length; i++) {
+            if (path == cn[i].innerHTML) {
+                return cn[i];
+            }
+            if (path.startsWith(cn[i].innerHTML + "/")) {
+                console.log("in:"+cn[i].innerHTML);
+                console.log("pre:" + path);
+                path = path.slice(cn[i].innerHTML.length + 1);
+                console.log("post:"+path);
+                if (i +1 >= cn.length){
+                    return undefined;
+                }
+                if(cn[i+1].nodeName !== "UL") {
+                    return undefined;
+                }
+                curr = cn[i + 1];
+                continue bigloop;
+            }
+            
+        }
+        return undefined ;
+    }
+    
+}
+
 
 

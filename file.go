@@ -86,5 +86,11 @@ func FileDeleter(u usr.Usr, w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Could not Delete File: "+err.Error(), 400)
 	}
 	return
+}
 
+func FileMover(u usr.Usr, w http.ResponseWriter, r *http.Request) {
+	fpath := strings.TrimSpace(r.FormValue("fname"))
+	if fpath == "" {
+		http.Error(w, "No From Filename Given", 400)
+	}
 }

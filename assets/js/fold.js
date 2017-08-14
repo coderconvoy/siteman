@@ -110,14 +110,25 @@ function selectFile(){
     for (el in els){
         if (els[el].classList) {
         els[el].classList.remove("hidden");
-        }else {
-            console.log("withselect no classlist : ",els[el]);
         }
     }
     foldns.selectfname = foldns.fname;
     foldns.selectpos = foldns.treepos;
-
 }
+
+function deselectFile(){
+    foldns.selectfname = undefined;
+    foldns.selectpos = undefined;
+
+    var els = document.getElementsByClassName("with_select");
+    for (el in els){
+        if (els[el].classList) {
+        els[el].classList.add("hidden");
+        }
+    }
+}
+
+
 
 function descend(path){
     var root = document.getElementById("treetop");
@@ -151,5 +162,26 @@ function descend(path){
     
 }
 
+function moveHere(caller){
+    
+    newpath = foldns.fname + "/" + foldns.selectfname.split('/').pop();
+    
+    $.ajax({
+        url:"/move",
+        type:"POST",
+        data:{
+            fname:foldns.selectfname,
+            tname:newpath
+        },
+        success:function(){
+            if (foldns.treepos ){
+                foldns.treepos.nextElementSibling.appendChild(foldns.selectpos)
+            }
+            deselectFile();
+        }
 
+    });
+
+
+}
 

@@ -91,6 +91,25 @@ func FileDeleter(u usr.Usr, w http.ResponseWriter, r *http.Request) {
 func FileMover(u usr.Usr, w http.ResponseWriter, r *http.Request) {
 	fpath := strings.TrimSpace(r.FormValue("fname"))
 	if fpath == "" {
-		http.Error(w, "No From Filename Given", 400)
+		http.Error(w, "No -From- Filename Given", 400)
+		return
 	}
+	tpath := strings.TrimSpace(r.FormValue("fname"))
+	if tpath == "" {
+		http.Error(w, "No -To- Filename Given", 400)
+		return
+	}
+
+	sfrom, err := u.ConvertPath(fpath)
+	if err != nil {
+		http.Error(w, "Could not Move File: "+err.Error(), 400)
+		return
+	}
+
+	sto, err := u.ConvertPath(tpath)
+	if err != nil {
+		http.Error(w, "Could not Move File: "+err.Error(), 400)
+		return
+	}
+
 }

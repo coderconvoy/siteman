@@ -34,26 +34,30 @@ func HomeView(u usr.Usr, w http.ResponseWriter, r *http.Request) {
 		b.AddChildren(htmq.NewText("Cannot read home directory: " + err.Error()))
 	}
 
-	fv.AddAttrs("id", "treetop")
-	loc := htmq.NewTextTag("p", "", "id", "loc-p")
+	fv = RootWrap(fv)
+	//Copy Paste Area
+	cpdiv := htmq.NewParent("div", []*htmq.Tag{
+		htmq.NewTextTag("p", "", "id", "loc-p"),
+		htmq.QBut("Select", "selectFile(this)"),
+		htmq.QBut("Move Here", "moveHere(this)", "class", "with_select hidden"), htmq.NewText("<br>"),
+		htmq.QBut("Rename", "rename(this)"),
+	}, "id", "copydiv")
 	//File View
 	tdiv := htmq.NewParent("div", []*htmq.Tag{
 		htmq.NewTag("textarea", "id", "filebox"),
 		htmq.NewText("<br>"),
 		htmq.QBut("Delete", "deleteFile(this)"),
 		htmq.QBut("Save", "saveFile(this)"),
-		htmq.QBut("Select", "selectFile(this)"),
 	}, "id", "filediv")
 
 	//Folder View
 	foldiv := htmq.NewParent("div", []*htmq.Tag{
 
-		htmq.QBut("Move Here", "moveHere(this)", "class", "with_select hidden"), htmq.NewText("<br>"),
 		htmq.QInput("text", "filename", "id", "foltext"),
 		htmq.QBut("Add File", "addFile(this)"),
 	}, "id", "foldiv", "style", "display:none;")
 
-	b.AddChildren(fv, loc, tdiv, foldiv)
+	b.AddChildren(cpdiv, fv, tdiv, foldiv)
 
 	b.AddChildren(htmq.QScript("foldStart();"))
 

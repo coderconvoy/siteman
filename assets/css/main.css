@@ -18,6 +18,16 @@ textarea {
     height:80vh;
 }
 
+
 .hidden {
     display:none;
 }
+
+ul:after{
+    content:"";
+    background:red;
+    width:100;
+    height:20;
+}
+
+

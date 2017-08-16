@@ -63,6 +63,7 @@ func main() {
 
 	http.HandleFunc("/save", NewHandler(users, sesh, FileSaver))
 	http.HandleFunc("/delete", NewHandler(users, sesh, FileDeleter))
+	http.HandleFunc("/move", NewHandler(users, sesh, FileMover))
 	http.HandleFunc("/ass/", gojs.AssetHandler("/ass/", gojs.Single))
 	http.HandleFunc("/home", NewHandler(users, sesh, HomeView))
 	http.HandleFunc("/login", LoginHandler(users, sesh))

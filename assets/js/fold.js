@@ -8,7 +8,9 @@ function setPath(p,treepos){
     
 }
 
-function fold(caller,path){
+function fold(caller){
+    fpath = getPath(caller);
+    console.log("Caller path:" + fpath);
     document.getElementById("foldiv").style.display = "";
     document.getElementById("filediv").style.display = "none";
 
@@ -20,11 +22,13 @@ function fold(caller,path){
     }else {
         sib.style.display = "";
     }
-    setPath(path,caller);
+    setPath(fpath,caller);
 }
 
 
-function showFile(fname,caller){
+function showFile(caller){
+    fname = getPath(caller);
+    console.log("showFile: " , fname);
     document.getElementById("foldiv").style.display = "none";
     document.getElementById("filediv").style.display = "";
 
@@ -128,7 +132,24 @@ function deselectFile(){
     }
 }
 
-
+function getPath(treeitem){
+    path = treeitem.innerHTML;
+    while(true){
+        paritem = treeitem.parentNode.previousElementSibling;
+        if (! paritem) {
+            return path;
+        }
+        if (paritem.nodeName !== "LI"){
+            return path;
+        }
+        if (paritem.innerHTML == "/"){
+            return path;
+        }
+        treeitem = paritem;
+        path = treeitem.innerHTML + "/" + path;
+        
+    }
+}
 
 function descend(path){
     var root = document.getElementById("treetop");
@@ -165,6 +186,7 @@ function descend(path){
 function moveHere(caller){
     
     newpath = foldns.fname + "/" + foldns.selectfname.split('/').pop();
+    console.log("Moving file to " + newpath);
     
     $.ajax({
         url:"/move",
@@ -173,15 +195,59 @@ function moveHere(caller){
             fname:foldns.selectfname,
             tname:newpath
         },
-        success:function(){
-            if (foldns.treepos ){
-                foldns.treepos.nextElementSibling.appendChild(foldns.selectpos)
+        success:function(data){
+            console.log("Moving: " ,data);
+            if (foldns.treepos && foldns.selectpos){
+                var chids = foldns.selectpos.nextElementSibling;
+                var newloc = foldns.treepos.nextElementSibling;
+                newloc.appendChild(foldns.selectpos)
+                if (chids ) if (chids.nodeName == "UL") { // if if for order
+                    newloc.appendChild(chids); 
+                }
             }
             deselectFile();
+        },
+        error:function(data){
+            console.log("ERROR:" ,data);
         }
 
     });
-
-
 }
 
+function rename(caller){
+    if (!foldns.treepos) {
+        return;
+    }
+    var fname = foldns.treepos.innerHTML;
+    tname = prompt("What would you like to rename '"+ fname+ "'?");
+
+    if (!tname ) {
+        return;
+    }
+
+    var fpath = getPath(foldns.treepos);
+    var pathonly = fpath.substring(0,fpath.lastIndexOf("/"));
+    console.log(",Pathonly : " ,pathonly);
+
+
+    $.ajax({
+        url:"/move",
+        type:"POST",
+        data:{
+            fname:fpath,
+            tname:pathonly + "/" +tname,
+        },
+        success:function(data){
+            console.log("Moving: " ,data);
+            if (foldns.treepos){
+                foldns.treepos.innerHTML = tname;
+            }
+            deselectFile();
+        },
+        error:function(data){
+            console.log("ERROR:" ,data);
+        }
+    });
+
+    
+}

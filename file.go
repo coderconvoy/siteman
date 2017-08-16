@@ -13,6 +13,14 @@ import (
 	"github.com/coderconvoy/siteman/usr"
 )
 
+func RootWrap(ul *htmq.Tag) *htmq.Tag {
+
+	return htmq.NewParent("ul", []*htmq.Tag{
+		htmq.NewTextTag("li", "/", "onclick", "fold(this)", "class", "treefolder"),
+		ul,
+	}, "id", "treetop")
+}
+
 func FileView(root, lpath string, md int) (*htmq.Tag, error) {
 	cpath := path.Join(root, lpath)
 	if !strings.HasPrefix(cpath, root) {
@@ -26,7 +34,7 @@ func FileView(root, lpath string, md int) (*htmq.Tag, error) {
 	for _, v := range dir {
 		if v.IsDir() && md > 0 {
 			dp := path.Join(lpath, v.Name())
-			chids = append(chids, htmq.NewTextTag("li", v.Name(), "onclick", "fold(this,'"+dp+"')", "class", "treefolder"))
+			chids = append(chids, htmq.NewTextTag("li", v.Name(), "onclick", "fold(this)", "class", "treefolder"))
 			inner, e2 := FileView(root, dp, md-1)
 			inner.AddAttrs("style", "display:none;")
 			if e2 != nil {
@@ -35,7 +43,7 @@ func FileView(root, lpath string, md int) (*htmq.Tag, error) {
 			chids = append(chids, inner)
 			continue
 		}
-		chids = append(chids, htmq.NewTextTag("li", v.Name(), "onclick", "showFile('"+path.Join(lpath, v.Name())+"',this)", "class", "treefile"))
+		chids = append(chids, htmq.NewTextTag("li", v.Name(), "onclick", "showFile(this)", "class", "treefile"))
 	}
 	return htmq.NewParent("ul", chids), err
 }
@@ -94,7 +102,7 @@ func FileMover(u usr.Usr, w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "No -From- Filename Given", 400)
 		return
 	}
-	tpath := strings.TrimSpace(r.FormValue("fname"))
+	tpath := strings.TrimSpace(r.FormValue("tname"))
 	if tpath == "" {
 		http.Error(w, "No -To- Filename Given", 400)
 		return
@@ -109,6 +117,13 @@ func FileMover(u usr.Usr, w http.ResponseWriter, r *http.Request) {
 	sto, err := u.ConvertPath(tpath)
 	if err != nil {
 		http.Error(w, "Could not Move File: "+err.Error(), 400)
+		return
+	}
+
+	err = os.Rename(sfrom, sto)
+	if err != nil {
+		s := strings.Replace(err.Error(), u.Root, "/", -1)
+		http.Error(w, "Could not Move File: "+s, 400)
 		return
 	}
 

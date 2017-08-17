@@ -31,3 +31,11 @@ ul:after{
 }
 
 
+.bottomrow{
+    position:fixed;
+    bottom:0;
+    background:#99ffff;
+    padding:5px;
+    height:40px;
+    right:0px;
+}

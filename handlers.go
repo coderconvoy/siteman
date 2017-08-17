@@ -46,8 +46,10 @@ func HomeView(u usr.Usr, w http.ResponseWriter, r *http.Request) {
 	tdiv := htmq.NewParent("div", []*htmq.Tag{
 		htmq.NewTag("textarea", "id", "filebox"),
 		htmq.NewText("<br>"),
-		htmq.QBut("Delete", "deleteFile(this)"),
-		htmq.QBut("Save", "saveFile(this)"),
+		htmq.NewParent("div", []*htmq.Tag{
+			htmq.QBut("Delete", "deleteFile(this)"),
+			htmq.QBut("Save", "saveFile(this)"),
+		}, "class", "bottomrow"),
 	}, "id", "filediv")
 
 	//Folder View

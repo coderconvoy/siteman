@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -126,5 +127,55 @@ func FileMover(u usr.Usr, w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Could not Move File: "+s, 400)
 		return
 	}
+
+}
+
+func FileUploader(u usr.Usr, w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		http.Error(w, "Upload Expected Post", 400)
+		return
+	}
+
+	r.ParseMultipartForm(32 << 20)
+	file, handler, err := r.FormFile("uploadfile")
+
+	if err != nil {
+		http.Error(w, "Upload Error: "+err.Error(), 400)
+		return
+	}
+	defer file.Close()
+
+	uppath, err := u.ConvertPath("uploads")
+
+	if err != nil {
+		http.Error(w, "Upload Error: "+err.Error(), 400)
+		return
+	}
+
+	err = os.MkdirAll(uppath, 0777)
+	if err != nil {
+		http.Error(w, "Upload Error: Could not make uploads Directory: "+err.Error(), 400)
+		return
+	}
+
+	spath := path.Join(uppath, handler.Filename)
+	if !strings.HasPrefix(spath, uppath) {
+		http.Error(w, "Path tried to escape parent folder", 400)
+		return
+	}
+
+	out, err := os.OpenFile(spath, os.O_WRONLY|os.O_CREATE, 0777)
+	if err != nil {
+		http.Error(w, "Could not open file for writing", 400)
+		return
+	}
+	defer out.Close()
+
+	_, err = io.Copy(out, file)
+	if err != nil {
+		http.Error(w, "File could not write correctly", 400)
+	}
+
+	http.Redirect(w, r, "/home", 303)
 
 }

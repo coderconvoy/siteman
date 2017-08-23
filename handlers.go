@@ -37,10 +37,10 @@ func HomeView(u usr.Usr, w http.ResponseWriter, r *http.Request) {
 	fv = RootWrap(fv)
 	//Copy Paste Area
 	cpdiv := htmq.NewParent("div", []*htmq.Tag{
-		htmq.NewTextTag("p", "", "id", "loc-p"),
 		htmq.QBut("Select", "selectFile(this)"),
-		htmq.QBut("Move Here", "moveHere(this)", "class", "with_select hidden"), htmq.NewText("<br>"),
+		htmq.QBut("Move Here", "moveHere(this)", "class", "with_select hidden"),
 		htmq.QBut("Rename", "rename(this)"),
+		htmq.NewTextTag("p", "", "id", "loc-p"),
 	}, "id", "copydiv")
 	//File View
 	tdiv := htmq.NewParent("div", []*htmq.Tag{
@@ -57,10 +57,10 @@ func HomeView(u usr.Usr, w http.ResponseWriter, r *http.Request) {
 		htmq.QInput("text", "filename", "id", "foltext"),
 		htmq.QBut("Add File", "addFile(this)"),
 		htmq.QText("<br>"),
-		htmq.QUpload("/upload"),
+		htmq.QUpload("/upload", []*htmq.Tag{htmq.QInput("text", "fup-location", "id", "fup-location", "--hidden")}),
 	}, "id", "foldiv", "style", "display:none;")
 
-	b.AddChildren(cpdiv, fv, tdiv, foldiv)
+	b.AddChildren(fv, htmq.NewParent("div", []*htmq.Tag{cpdiv, tdiv, foldiv}, "id", "rightdiv"))
 
 	b.AddChildren(htmq.QScript("foldStart();"))
 

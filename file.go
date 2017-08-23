@@ -145,16 +145,15 @@ func FileUploader(u usr.Usr, w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	uppath, err := u.ConvertPath("uploads")
-
-	if err != nil {
-		http.Error(w, "Upload Error: "+err.Error(), 400)
+	fup := r.FormValue("fup-location")
+	if fup == "" {
+		http.Error(w, "No Folder Location provided", 400)
 		return
 	}
 
-	err = os.MkdirAll(uppath, 0777)
+	uppath, err := u.ConvertPath(fup)
 	if err != nil {
-		http.Error(w, "Upload Error: Could not make uploads Directory: "+err.Error(), 400)
+		http.Error(w, "Upload Error: "+err.Error(), 400)
 		return
 	}
 

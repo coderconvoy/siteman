@@ -23,6 +23,8 @@ function fold(caller){
         sib.style.display = "";
     }
     setPath(fpath,caller);
+    var upcheck = document.getElementById("fup-location");
+    upcheck.value = fpath;
 }
 
 
@@ -111,13 +113,15 @@ function deleteFile(caller){
 
 function selectFile(){
     var els = document.getElementsByClassName("with_select");
-    for (el in els){
+    for (var el in els){
         if (els[el].classList) {
         els[el].classList.remove("hidden");
         }
     }
     foldns.selectfname = foldns.fname;
     foldns.selectpos = foldns.treepos;
+
+    
 }
 
 function deselectFile(){

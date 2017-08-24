@@ -76,7 +76,7 @@ function addFile(caller){
                 var nleaf = document.createElement("li");
                 nleaf.innerHTML = filename;
                 nleaf.onclick = function(){
-                    showFile(fullname,this);
+                    showFile(this);
                 }
                 nleaf.className = "treefile";
                 foldns.treepos.nextElementSibling.appendChild(nleaf);
@@ -85,7 +85,7 @@ function addFile(caller){
                 console.log("No treepos",foldns.treepos);
             }
             setPath(fullname);
-            showFile(fullname);
+            showFile(nleaf);
 
         }
     });

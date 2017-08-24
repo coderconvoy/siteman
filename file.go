@@ -97,6 +97,25 @@ func FileDeleter(u usr.Usr, w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+func Mkdir(u usr.Usr, w http.ResponseWriter, r *http.Request) {
+	p := strings.TrimSpace(r.FormValue("fname"))
+	floc := strings.TrimSpace(r.FormValue("floc"))
+
+	path := u.ConvertPath(p)
+	if err != nil {
+		http.Error(w, "Could not create directory: "+err.Error(), 400)
+		return
+	}
+
+	np := path.Join(path, floc)
+	if !strings.HasPrefix(np, path) {
+		http.Error(w, "No Upwards Pathing:"+err.Error(), 400)
+		return
+	}
+
+	//TODO Add mkdir
+}
+
 func FileMover(u usr.Usr, w http.ResponseWriter, r *http.Request) {
 	fpath := strings.TrimSpace(r.FormValue("fname"))
 	if fpath == "" {
@@ -176,5 +195,4 @@ func FileUploader(u usr.Usr, w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, "/home", 303)
-
 }

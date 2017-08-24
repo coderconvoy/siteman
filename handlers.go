@@ -54,8 +54,8 @@ func HomeView(u usr.Usr, w http.ResponseWriter, r *http.Request) {
 
 	//Folder View
 	foldiv := htmq.NewParent("div", []*htmq.Tag{
-		htmq.QInput("text", "filename", "id", "foltext"),
-		htmq.QBut("Add File", "addFile(this)"),
+		htmq.QBut("Add Folder Here", "addFolder(this)"),
+		htmq.QBut("Add File Here", "addFile(this)"),
 		htmq.QText("<br>"),
 		htmq.QUpload("/upload", []*htmq.Tag{htmq.QInput("text", "fup-location", "id", "fup-location", "--hidden")}),
 	}, "id", "foldiv", "style", "display:none;")

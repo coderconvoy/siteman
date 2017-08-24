@@ -60,10 +60,51 @@ function saveFile(){
     });
 }
 
+function addFolder(caller){
+    var folname = prompt("Add Folder to " + foldns.fname + ": <br> Name :","untitled.txt");
+    if (folname == null){
+        return;
+    }
+    var fullname = foldns.fname + "/" + folname;
+    var teepos = foldns.treepos;
+    $.ajax({
+        url:"/mkdir",
+        type:"POST",
+        data:{
+            fname:fullname,
+        },
+        success:function(){
+            if (teepos) {
+                var nleaf = document.createElement("li");
+                nleaf.innerHTML = folname;
+                nleaf.onclick = function(){
+                    fold(this);
+                }
+                nleaf.className = "treefolder";
+                teepos.nextElementSibling.appendChild(nleaf);
+                
+                nchids = document.createElement("ul");
+                teepos.nextElementSibling.appendChild(nchids);
+
+
+            }else {
+                console.log("No treepos",foldns.treepos);
+            }
+            setPath(fullname);
+            showFile(nleaf);
+
+        }
+    });
+}
+
 function addFile(caller){ 
-    
-    var filename = document.getElementById("foltext").value;
+     
+    var filename = prompt("Add Folder to " + foldns.fname + ": <br> File Name :","untitled.txt");
+    if (filename == null){
+        return;
+    }
     var fullname = foldns.fname + "/" + filename
+
     $.ajax({
         url:"/save",
         type:"POST",

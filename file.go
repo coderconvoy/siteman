@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -53,12 +52,12 @@ func FileGetter(u usr.Usr, w http.ResponseWriter, r *http.Request) {
 	p := strings.TrimPrefix(r.URL.Path, "/usr/")
 	p2, err := u.ConvertPath(p)
 	if err != nil {
-		fmt.Fprintln(w, "Could not find file ", p)
+		http.Error(w, "Could not access file by that name"+err.Error(), 400)
 		return
 	}
 	cc, err := ioutil.ReadFile(p2)
 	if err != nil {
-		w.Write([]byte(err.Error()))
+		http.Error(w, "Could not read file: "+err.Error(), 400)
 		return
 	}
 	w.Write(cc)

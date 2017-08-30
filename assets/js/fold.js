@@ -1,6 +1,27 @@
 foldns = { };
 
 
+function showError(mess,isHappy) {
+    var emes = document.createElement("p");
+    var eloc = document.getElementById("messbar");
+
+    emes.innerHTML = mess;
+    emes.className = "emess";
+    if (isHappy){
+        emes.className = "gmess";
+    }
+    emes.onclick = function(){
+        this.remove();
+        if (!eloc.firstChild){
+            eloc.classList.add("hidden");
+        }
+        
+    }
+
+    eloc.appendChild(emes);
+    eloc.classList.remove("hidden");
+}
+
 function setPath(p,treepos){
     foldns.fname = p;
     foldns.treepos = treepos;
@@ -125,9 +146,13 @@ function addFile(caller){
             }else {
                 console.log("No treepos",foldns.treepos);
             }
+
             setPath(fullname);
             showFile(nleaf);
 
+        },
+        error:function(){
+            showError("Could not create file : " + nleaf);
         }
     });
 }
@@ -144,8 +169,12 @@ function deleteFile(caller){
             fname:foldns.fname,
         },
         success:function(){
+            showError("Deleted: " + foldns.fname,true);
             console.log("Deleting : ", foldns.treepos);
             foldns.treepos.remove();
+        },
+        error :function(){
+            showError("Could not delete" + foldns.fname);
         }
 
     });
@@ -253,7 +282,7 @@ function moveHere(caller){
             deselectFile();
         },
         error:function(data){
-            console.log("ERROR:" ,data);
+            showError("ERROR:" +data);
         }
 
     });
@@ -290,7 +319,7 @@ function rename(caller){
             deselectFile();
         },
         error:function(data){
-            console.log("ERROR:" ,data);
+            showError("ERROR:" +data);
         }
     });
 

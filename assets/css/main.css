@@ -13,6 +13,35 @@ body{
 }
 
 
+#messbar{
+    position:fixed;
+    top:0px;
+    left:20px;
+    right:20px;
+    text-align:center;
+}
+
+.emess, .gmess {
+    border:1px solid black;
+    margin:5px;
+    padding:10px;
+    width:100%;
+    cursor:pointer;
+}
+
+.gmess {
+    background:lime;
+}
+
+.emess {
+    border:1px solid black;
+    margin:5px;
+    padding:10px;
+    width:100%;
+    cursor:pointer;
+    background:red;
+}
+
 
 .treefolder{
     color:red;

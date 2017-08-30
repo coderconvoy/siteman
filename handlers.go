@@ -60,7 +60,7 @@ func HomeView(u usr.Usr, w http.ResponseWriter, r *http.Request) {
 		htmq.QUpload("/upload", []*htmq.Tag{htmq.QInput("text", "fup-location", "id", "fup-location", "--hidden")}),
 	}, "id", "foldiv", "style", "display:none;")
 
-	b.AddChildren(fv, htmq.NewParent("div", []*htmq.Tag{cpdiv, tdiv, foldiv}, "id", "rightdiv"))
+	b.AddChildren(fv, htmq.NewParent("div", []*htmq.Tag{htmq.NewTag("div", "id", "messbar", "class", "hidden"), cpdiv, tdiv, foldiv}, "id", "rightdiv"))
 
 	b.AddChildren(htmq.QScript("foldStart();"))
 

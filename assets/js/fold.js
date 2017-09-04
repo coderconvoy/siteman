@@ -48,18 +48,46 @@ function fold(caller){
     upcheck.value = fpath;
 }
 
+function isIMG(fname){
+    ext = fname.split('.').pop().toLowerCase();
+
+    console.log("isimg:" + ext);
+    
+    switch (ext){
+        case 'png':
+        case 'gif':
+        case 'svg':
+        case 'jpg':
+            return true;
+    }
+    return false;
+}
+
 
 function showFile(caller){
-    fname = getPath(caller);
+    var fname = getPath(caller);
     console.log("showFile: " , fname);
     document.getElementById("foldiv").style.display = "none";
     document.getElementById("filediv").style.display = "";
 
+    var pic = document.getElementById("fileimg");
     var box = document.getElementById("filebox");
     setPath(fname,caller);
-    $.get("/usr/"+fname,function(res){
-        box.value = res ;
-    });
+
+    var fpath = "/usr/"+fname;
+    
+    if (isIMG(fpath)) {
+        pic.classList.remove("hidden");
+        box.classList.add("hidden");
+        pic.src = fpath;
+    }else {
+        pic.classList.add("hidden");
+        box.classList.remove("hidden");
+        box.value = "--LOADING--";
+        $.get("/usr/"+fname,function(res){
+            box.value = res ;
+        });
+    }
     console.log("Loading-" + fname)
 }
 

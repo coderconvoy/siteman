@@ -185,28 +185,44 @@ function addFile(caller){
     });
 }
 
-function deleteFile(caller){
-    if (!  confirm("Are you sure you want to delete " + foldns.fname+ "?")){
-        return
-    }
-
+function postDelete(fname){
     $.ajax({
         url:"/delete",
         type:"POST",
         data:{
-            fname:foldns.fname,
+            fname:fname,
         },
         success:function(){
-            showError("Deleted: " + foldns.fname,true);
+            showError("Deleted: " + fname,true);
             console.log("Deleting : ", foldns.treepos);
             foldns.treepos.remove();
         },
-        error :function(){
-            showError("Could not delete" + foldns.fname);
+        error :function(resp){
+            showError("Could not delete " + fname + ":" + resp.responseText);
+            console.log(resp);
         }
 
     });
+}
 
+function deleteFolder(caller){
+    ans = window.prompt("Delete whole folder: Are you sure? Please confirm by typing the full path of the folder you wish to delete.'"+foldns.fname+"'");
+    if ( ans == "" ){
+        showError("Delete Canceled: "+ foldns.fname); 
+        return
+    }
+    if (ans !== foldns.fname){
+        showError("Typed Incorrectly, not deleted: " + foldns.fname);
+    }
+    postDelete(foldns.fname);
+}
+
+function deleteFile(caller){
+    if (!  confirm("Are you sure you want to delete " + foldns.fname+ "?")){
+        showError("Delete Canceled: "+ foldns.fname); 
+        return
+    }
+    postDelete(foldns.fname);
 }
 
 function selectFile(){

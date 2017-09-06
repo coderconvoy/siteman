@@ -89,7 +89,7 @@ func FileDeleter(u usr.Usr, w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Could not Delete File: "+err.Error(), 400)
 		return
 	}
-	err = os.Remove(p2)
+	err = os.RemoveAll(p2)
 	if err != nil {
 		http.Error(w, "Could not Delete File: "+err.Error(), 400)
 	}

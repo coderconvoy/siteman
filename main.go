@@ -70,6 +70,7 @@ func main() {
 	http.HandleFunc("/home", NewHandler(users, sesh, HomeView))
 	http.HandleFunc("/login", LoginHandler(users, sesh))
 	http.HandleFunc("/usr/", NewHandler(users, sesh, FileGetter))
+	http.HandleFunc("/tabusr/", NewHandler(users, sesh, FileGetter))
 	http.HandleFunc("/", Handle)
 
 	fmt.Println("Starting Server")

@@ -1,1 +1,1 @@
-[{"Username":"user1","Password":{"Hash":"hr2o6pb4atP9XcqmRI9vpqyJMB7GLJrqPwjqlDiGfCo=","Salt":"R7OU4hGrY+adQQ=="},"Root":"test_data/site/one/","Edit":"/"}]
+[{"Username":"user1","Password":{"Hash":"hr2o6pb4atP9XcqmRI9vpqyJMB7GLJrqPwjqlDiGfCo=","Salt":"R7OU4hGrY+adQQ=="},"Root":"test_data/site/one/","Edit":"/"},{"Username":"MD","Password":{"Hash":"QX4mV/41Z2byIWjcjBoKlzjWfeV8f8e11rbGcb3hzis=","Salt":"iFq4JUMpfUDbLA=="},"Root":"test_data/site/md","Edit":"/"}]

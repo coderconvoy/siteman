@@ -43,8 +43,12 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 func main() {
 	usrn := flag.Bool("usr", false, "Create or Edit a User")
 	usrf := flag.String("usrf", "usrdata.json", "Set Userdata file")
+	noconf := flag.Bool("noconf", false, "Use Default Configuration")
+	confloc := flag.String("config", "", "Config File Location")
 
 	flag.Parse()
+
+	conf := getConfig(*confloc, *noconf)
 
 	if *usrn {
 		usr.RunUserFunc(*usrf)

@@ -7,7 +7,7 @@ import (
 	"github.com/coderconvoy/lazyf"
 )
 
-func confLocs() {
+func confLocs() []string {
 	home := os.Getenv("HOME")
 	return []string{
 		"test_data/.sitemanconf",
@@ -17,12 +17,12 @@ func confLocs() {
 	}
 }
 
-func getConfig(cloc string, usedef bool) lazyf.LZ {
+func getConfig(cloc string, usedef bool) (lazyf.LZ, error) {
 	if usedef {
-		return lazyf.LZ{}
+		return lazyf.LZ{}, nil
 	}
 	if cloc == "" {
-		return lazyf.GetConfigN(0, confLocs())
+		return lazyf.GetConfigN(0, confLocs()...)
 	}
 	return lazyf.GetConfigN(0, cloc)
 }

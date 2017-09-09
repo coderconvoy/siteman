@@ -43,12 +43,17 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 func main() {
 	usrn := flag.Bool("usr", false, "Create or Edit a User")
 	usrf := flag.String("usrf", "usrdata.json", "Set Userdata file")
+	insec := flag.Bool("i", false, "Run insecure")
 	noconf := flag.Bool("noconf", false, "Use Default Configuration")
 	confloc := flag.String("config", "", "Config File Location")
 
 	flag.Parse()
 
-	conf := getConfig(*confloc, *noconf)
+	conf, err := getConfig(*confloc, *noconf)
+	if err != nil {
+		fmt.Println("Config Error:", err)
+		return
+	}
 
 	if *usrn {
 		usr.RunUserFunc(*usrf)
@@ -79,6 +84,16 @@ func main() {
 
 	fmt.Println("Starting Server")
 
-	log.Fatal(http.ListenAndServe(":8090", nil))
+	if *insec || conf.PBoolD(false, "insec", "insecure") {
+		//Run without https
+		insPort := conf.PStringD("8090", "ins-port")
+		log.Fatal(http.ListenAndServe(":"+insPort, nil))
+	}
+
+	pubkey := conf.PStringD("data/server.pub", "pubkey")
+	privkey := conf.PStringD("data/server.key", "privkey")
+	secPort := conf.PStringD("8091", "port")
+
+	log.Fatal(http.ListenAndServeTLS(":"+secPort, pubkey, privkey, nil))
 
 }

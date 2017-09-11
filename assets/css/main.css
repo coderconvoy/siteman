@@ -92,6 +92,13 @@ ul:after{
 }
 
 
+.topright{
+    position:fixed;
+    margin:5px;
+    top:5px;
+    right:5px;
+}
+
 .bottomrow{
     position:fixed;
     bottom:0;

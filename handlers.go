@@ -63,7 +63,9 @@ func HomeView(u usr.Usr, w http.ResponseWriter, r *http.Request) {
 		htmq.QBut("Delete Folder", "deleteFolder(this)"),
 	}, "id", "foldiv", "style", "display:none;")
 
-	b.AddChildren(fv, htmq.NewParent("div", []*htmq.Tag{htmq.NewTag("div", "id", "messbar", "class", "hidden"), cpdiv, tdiv, foldiv}, "id", "rightdiv"))
+	b.AddChildren(
+		htmq.NewParent("div", []*htmq.Tag{htmq.QLink("/logout", "Logout")}, "class", "topright"),
+		fv, htmq.NewParent("div", []*htmq.Tag{htmq.NewTag("div", "id", "messbar", "class", "hidden"), cpdiv, tdiv, foldiv}, "id", "rightdiv"))
 
 	b.AddChildren(htmq.QScript("foldStart();"))
 

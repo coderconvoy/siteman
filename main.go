@@ -36,6 +36,14 @@ func LoginHandler(uu []usr.Usr, sc *dbase.SessionControl) MuxFunc {
 	}
 }
 
+func LogoutHandler(uu []usr.Usr, sc *dbase.SessionControl) MuxFunc {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		sc.Logout(w, r)
+		Handle(w, r)
+	}
+}
+
 func Handle(w http.ResponseWriter, r *http.Request) {
 
 	w.Write(IndexPage().Bytes())
@@ -92,6 +100,7 @@ func main() {
 	http.HandleFunc("/ass/", gojs.AssetHandler("/ass/", gojs.Single))
 	http.HandleFunc("/home", NewHandler(users, sesh, HomeView))
 	http.HandleFunc("/login", LoginHandler(users, sesh))
+	http.HandleFunc("/logout", LogoutHandler(users, sesh))
 	http.HandleFunc("/usr/", NewHandler(users, sesh, FileGetter))
 	http.HandleFunc("/tabusr/", NewHandler(users, sesh, FileGetter))
 	http.HandleFunc("/", Handle)

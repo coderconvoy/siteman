@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/coderconvoy/dbase"
+	"github.com/coderconvoy/lazyf"
 	"github.com/pkg/errors"
 )
 
@@ -23,7 +24,13 @@ func absPath(uu []Usr, fpath string) []Usr {
 	res := []Usr{}
 	for _, v := range uu {
 		u := v
-		u.Root = path.Join(fpath, u.Root)
+		s := lazyf.EnvReplace(u.Root)
+		if len(s) == 0 {
+			continue
+		}
+		if s[0] != '/' {
+			u.Root = path.Join(fpath, s)
+		}
 		res = append(res, u)
 	}
 	return res
@@ -50,7 +57,7 @@ func RunUserFunc(fname string) {
 	fmt.Println("Running User Setup with ", fname)
 	uu, err := ReadUsers(fname)
 	if err != nil {
-		fmt.Println("Could not read file", err)
+		fmt.Println("Could not read file :", fname, ":", err)
 
 		if !ask.AskBool("continue", false) {
 			fmt.Println("Exiting")

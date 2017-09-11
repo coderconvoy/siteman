@@ -1,13 +1,14 @@
 package main
 
 import (
-	"errors"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"path"
 	"strings"
+
+	"github.com/pkg/errors"
 
 	"github.com/coderconvoy/htmq"
 	"github.com/coderconvoy/siteman/usr"
@@ -24,8 +25,9 @@ func RootWrap(ul *htmq.Tag) *htmq.Tag {
 func FileView(root, lpath string, md int) (*htmq.Tag, error) {
 	cpath := path.Join(root, lpath)
 	if !strings.HasPrefix(cpath, root) {
-		return nil, errors.New("Tried to escape the root")
+		return nil, errors.Errorf("Tried to escape the root :%s:%s ", root, cpath)
 	}
+
 	dir, err := ioutil.ReadDir(cpath)
 	if err != nil {
 		return nil, err

@@ -9,6 +9,7 @@ import (
 
 	"github.com/coderconvoy/dbase"
 	"github.com/coderconvoy/gojs"
+	"github.com/coderconvoy/lazyf"
 	"github.com/coderconvoy/siteman/usr"
 )
 
@@ -42,7 +43,7 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	usrn := flag.Bool("usr", false, "Create or Edit a User")
-	usrf := flag.String("usrf", "usrdata.json", "Set Userdata file")
+	usrf := flag.String("usrf", "", "Set Userdata file")
 	insec := flag.Bool("i", false, "Run insecure")
 	noconf := flag.Bool("noconf", false, "Use Default Configuration")
 	confloc := flag.String("config", "", "Config File Location")
@@ -54,13 +55,26 @@ func main() {
 		fmt.Println("Config Error:", err)
 		return
 	}
+	//Testing map
+	fmt.Println("Config")
+	for k, v := range conf.Deets {
+		fmt.Println("\t", k, ":", v)
+	}
+
+	usrloc := *usrf
+	if *usrf == "" {
+		loc := conf.PStringD("userdata.json", "userfile")
+		fmt.Println("userfile == ", loc)
+		usrloc = lazyf.EnvReplace(loc)
+	}
+	fmt.Println("Userfile at :" + usrloc)
 
 	if *usrn {
-		usr.RunUserFunc(*usrf)
+		usr.RunUserFunc(usrloc)
 		return
 	}
 
-	users, err := usr.LoadUsers(*usrf)
+	users, err := usr.LoadUsers(usrloc)
 	if err != nil {
 		fmt.Println(err)
 		return

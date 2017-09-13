@@ -71,7 +71,7 @@ func main() {
 
 	usrloc := *usrf
 	if *usrf == "" {
-		loc := conf.PStringD("userdata.json", "userfile")
+		loc := conf.PStringD("usrdata.json", "userfile")
 		fmt.Println("userfile == ", loc)
 		usrloc = lazyf.EnvReplace(loc)
 	}

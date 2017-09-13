@@ -91,11 +91,29 @@ func FileDeleter(u usr.Usr, w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Could not Delete File: "+err.Error(), 400)
 		return
 	}
-	err = os.RemoveAll(p2)
-	if err != nil {
-		http.Error(w, "Could not Delete File: "+err.Error(), 400)
+	//Delete properly if already in trash folder:
+	if strings.HasPrefix(p2, path.Join(u.Root, "/trash/")) {
+		err = os.RemoveAll(p2)
+		if err != nil {
+			http.Error(w, "Could not Delete File: "+err.Error(), 400)
+		}
+		return
 	}
-	return
+
+	tpath := path.Join(u.Root, "/trash/")
+	err = os.MkdirAll(tpath, 0777)
+	if err != nil {
+		http.Error(w, "Could not Create Trash directory: "+err.Error(), 400)
+		return
+	}
+
+	npath := path.Join(tpath, path.Base(p))
+
+	err = os.Rename(p2, npath)
+	if err != nil {
+		http.Error(w, "Could not move to trash"+err.Error(), 400)
+		return
+	}
 }
 
 func Mkdir(u usr.Usr, w http.ResponseWriter, r *http.Request) {

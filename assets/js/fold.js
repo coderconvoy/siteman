@@ -1,5 +1,40 @@
 foldns = { };
 
+//Use as Callback for ajax edit errors
+function editError(resp) {
+    showError("Edit Error: " + resp.responseText);
+}
+
+//Use as callback for ajax fs edits
+function editResponse(data){
+    //Coming: Go through responses from server and enact basic operations
+    for ( p in data) {
+        switch (data[p].Op.toLowerCase()) {
+            case "say":
+                editSay(data[p].Params);
+                break;
+        }
+    }
+
+
+}
+
+function editSay(mess){
+    showError(mess,true);
+}
+
+function editMKDir(){
+    //TODO
+}
+
+function editNew(){
+}
+
+function editRM(){
+}
+
+function editMV(){
+}
 
 function showError(mess,isHappy) {
     var emes = document.createElement("p");
@@ -104,8 +139,7 @@ function saveFile(){
             fname:foldns.fname,
             fcontents:fbox.value
         },
-        success:function(){
-        }
+        success:editResponse
     });
 }
 
@@ -179,9 +213,7 @@ function addFile(caller){
             showFile(nleaf);
 
         },
-        error:function(){
-            showError("Could not create file : " + nleaf);
-        }
+        error:editError
     });
 }
 

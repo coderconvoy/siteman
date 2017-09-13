@@ -97,7 +97,9 @@ func FileDeleter(u usr.Usr, w http.ResponseWriter, r *http.Request) {
 		err = os.RemoveAll(p2)
 		if err != nil {
 			http.Error(w, "Could not Delete File: "+err.Error(), 400)
+			return
 		}
+		WriteEdits(w, []Edit{{"rm", p2}, {"say", "Permanently Deleted: " + p2}}...)
 		return
 	}
 

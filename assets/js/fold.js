@@ -1,17 +1,37 @@
 foldns = { };
+editns = {} ;
 
 //Use as Callback for ajax edit errors
-function editError(resp) {
+editns.error = function(resp) {
     showError("Edit Error: " + resp.responseText);
 }
 
 //Use as callback for ajax fs edits
-function editResponse(data){
+editns.success = function(data){
     //Coming: Go through responses from server and enact basic operations
     for ( p in data) {
+        var pp = data[p].Params;
         switch (data[p].Op.toLowerCase()) {
             case "say":
-                editSay(data[p].Params);
+                showError(pp,true);
+                break;
+            case "err":
+                showError(pp);
+                break;
+            case "rm" :
+                editns.rm(pp)
+                break;
+            case "mkdir" : 
+                editns.mkdir(pp);
+                break;
+            case "new" :
+                editns.newFile(pp);
+                break;
+            case "mv" : 
+                editns.mv(pp);
+                break;
+            default :
+                showError("Unknown operation: " + data[p].Op);
                 break;
         }
     }
@@ -19,22 +39,54 @@ function editResponse(data){
 
 }
 
-function editSay(mess){
-    showError(mess,true);
+editns.mkdirs = function(names) {
+    var nn = names.split(",");
+    for (p in nn) {
+        editns.mkdir(nn[p]);
+    }
 }
 
-function editMKDir(){
+editns.mkdir = function(fname) {
+    var pp = fname.split("/");
+    if (pp[0] == "") pp = pp.splice(0,1); 
+
+    curr = document.getElementById("treetop");
+    for (p in pp ){
+        fileChild(pp[p])
+    }
     //TODO
+    
+           /** if (teepos) {
+                var nleaf = document.createElement("li");
+                nleaf.innerHTML = folname;
+                nleaf.onclick = function(){
+                    fold(this);
+                }
+                nleaf.className = "treefolder";
+                teepos.nextElementSibling.appendChild(nleaf);
+                
+                nchids = document.createElement("ul");
+                teepos.nextElementSibling.appendChild(nchids);
+
+
+            }else {
+                console.log("No treepos",foldns.treepos);
+            }
+            setPath(fullname);
+            showFile(nleaf);
+            */
 }
 
-function editNew(){
+
+editns.newFile = function(fname){
 }
 
-function editRM(){
+editns.rm = function(fname){
 }
 
-function editMV(){
+editns.mv = function(fname){
 }
+
 
 function showError(mess,isHappy) {
     var emes = document.createElement("p");
@@ -71,7 +123,6 @@ function fold(caller){
     document.getElementById("filediv").style.display = "none";
 
     var sib = caller.nextElementSibling;
-    console.log("sib ==", sib)
 
     if (sib.style.display !== "none" && foldns.treepos === caller) {
         sib.style.display = "none";
@@ -139,7 +190,7 @@ function saveFile(){
             fname:foldns.fname,
             fcontents:fbox.value
         },
-        success:editResponse
+        success:editns.success
     });
 }
 
@@ -156,27 +207,7 @@ function addFolder(caller){
         data:{
             fname:fullname,
         },
-        success:function(){
-            if (teepos) {
-                var nleaf = document.createElement("li");
-                nleaf.innerHTML = folname;
-                nleaf.onclick = function(){
-                    fold(this);
-                }
-                nleaf.className = "treefolder";
-                teepos.nextElementSibling.appendChild(nleaf);
-                
-                nchids = document.createElement("ul");
-                teepos.nextElementSibling.appendChild(nchids);
-
-
-            }else {
-                console.log("No treepos",foldns.treepos);
-            }
-            setPath(fullname);
-            showFile(nleaf);
-
-        }
+        success:editns.success
     });
 }
 
@@ -213,7 +244,7 @@ function addFile(caller){
             showFile(nleaf);
 
         },
-        error:editError
+        error:editns.error
     });
 }
 
@@ -283,13 +314,10 @@ function deselectFile(){
 }
 
 function getPath(treeitem){
-    path = treeitem.innerHTML;
+    var path = treeitem.innerHTML;
     while(true){
-        paritem = treeitem.parentNode.previousElementSibling;
+        paritem = filePar(treeitem); 
         if (! paritem) {
-            return path;
-        }
-        if (paritem.nodeName !== "LI"){
             return path;
         }
         if (paritem.innerHTML == "/"){
@@ -297,39 +325,48 @@ function getPath(treeitem){
         }
         treeitem = paritem;
         path = treeitem.innerHTML + "/" + path;
-        
+    }
+}
+
+function filePar(pfile) {
+    var paritem = pfile.parentNode.previousElementSibling;
+    if (!paritem) {
+        return undefined;
+    }
+    if (paritem.nodeName !== "LI") {
+        return undefined;
+    }
+    return paritem;
+}
+
+function fileChild(pfile,childname) {
+    plist = pfile.nextElementSibling;
+    var cn = plist.children;
+    if (!cn) {
+        return undefined;
+    }
+    if (cn.nodeName !== "UL") {
+        return undefined;
+    }
+    for ( var i = 0; i < cn.length; i++) {
+        if (childname == cn[i].innerHTML) {
+            return cn[i];
+        }
     }
 }
 
 function descend(path){
     var root = document.getElementById("treetop");
-    console.log("root",root)
     var curr = root;
-    bigloop:
-    while (true){
-        var cn = curr.children;
-        for ( var i = 0; i < cn.length; i++) {
-            if (path == cn[i].innerHTML) {
-                return cn[i];
-            }
-            if (path.startsWith(cn[i].innerHTML + "/")) {
-                console.log("in:"+cn[i].innerHTML);
-                console.log("pre:" + path);
-                path = path.slice(cn[i].innerHTML.length + 1);
-                console.log("post:"+path);
-                if (i +1 >= cn.length){
-                    return undefined;
-                }
-                if(cn[i+1].nodeName !== "UL") {
-                    return undefined;
-                }
-                curr = cn[i + 1];
-                continue bigloop;
-            }
-            
+    ps = path.split("/");
+    for (var i =0 ; i < ps.length; i++ ) {
+        if (i ==0 && ps[i] === "" ) continue;
+        curr = fileChild(curr,ps[i]);
+        if (!curr) {
+            return undefined;
         }
-        return undefined ;
     }
+    return curr;
     
 }
 

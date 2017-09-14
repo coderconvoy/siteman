@@ -1,4 +1,6 @@
-foldns = { };
+//Depends on treeview.js
+
+foldns = {};
 editns = {} ;
 
 //Use as Callback for ajax edit errors
@@ -22,7 +24,7 @@ editns.success = function(data){
                 editns.rm(pp)
                 break;
             case "mkdir" : 
-                editns.mkdir(pp);
+                editns.mkdirs(pp);
                 break;
             case "new" :
                 editns.newFile(pp);
@@ -48,43 +50,54 @@ editns.mkdirs = function(names) {
 
 editns.mkdir = function(fname) {
     var pp = fname.split("/");
-    if (pp[0] == "") pp = pp.splice(0,1); 
 
     curr = document.getElementById("treetop");
     for (p in pp ){
-        fileChild(pp[p])
-    }
-    //TODO
-    
-           /** if (teepos) {
-                var nleaf = document.createElement("li");
-                nleaf.innerHTML = folname;
-                nleaf.onclick = function(){
-                    fold(this);
-                }
-                nleaf.className = "treefolder";
-                teepos.nextElementSibling.appendChild(nleaf);
-                
-                nchids = document.createElement("ul");
-                teepos.nextElementSibling.appendChild(nchids);
+        if (p == 0  && pp[0] == "") continue;
 
-
-            }else {
-                console.log("No treepos",foldns.treepos);
+        var n = treeview.child(pp[p]);
+        if (!n ){
+            n = treeview.addChildFolder(curr,pp[p])   
+            if (!n){
+                showError("UI: Could not add child to " + curr.innerHTML);
+                return undefined;
             }
-            setPath(fullname);
-            showFile(nleaf);
-            */
+        }
+        curr = n;
+    }
+    return curr;
 }
 
 
-editns.newFile = function(fname){
+editns.newFiles = function(fname){
+    var ffs = fname.split(",");
+    var res = undefined;
+    for (p in ffs) {
+        var path = ffs[p].split("/");
+        var base = path.splice(-1,1);
+        var pnode = editns.mkdir(path);
+        if (pnode) {
+            res = treeview.addChildFile(pnode,base,showFile);
+        }
+    }
+    return res;
 }
 
 editns.rm = function(fname){
+    node = treeview.descend(fname);
+    treeview.remove(node);
 }
 
-editns.mv = function(fname){
+editns.mv = function(fname,tname){
+    var node = treeview.descend(fname);
+    blocks = treeview.remove(node);
+    console.log(blocks);
+    node.innerHTML = tname.split("/").pop();
+    
+    newloc = tname.substring(0,tname.lastIndexOf("/"));
+    newpar = treeview.descend(newloc);
+    treeview.addChildOb(newpar,blocks);
+
 }
 
 
@@ -113,7 +126,6 @@ function setPath(p,treepos){
     foldns.fname = p;
     foldns.treepos = treepos;
     document.getElementById("loc-p").innerHTML = p;
-    
 }
 
 function fold(caller){
@@ -177,21 +189,20 @@ function showFile(caller){
     console.log("Loading-" + fname)
 }
 
-function foldStart(){
-    console.log("Hello fold starter");
+function postAction(url,data){
+    $.ajax({
+        url:url,
+        type:"POST",
+        data:data,
+        success:editns.success,
+        error:editns.error
+    });
 }
+
 
 function saveFile(){
     var fbox = document.getElementById("filebox");
-    $.ajax({
-        url:"/save",
-        type:"POST",
-        data:{
-            fname:foldns.fname,
-            fcontents:fbox.value
-        },
-        success:editns.success
-    });
+    postAction("/save",{fname:foldns.fname,fcontents:fbox.value});
 }
 
 function addFolder(caller){
@@ -201,14 +212,7 @@ function addFolder(caller){
     }
     var fullname = foldns.fname + "/" + folname;
     var teepos = foldns.treepos;
-    $.ajax({
-        url:"/mkdir",
-        type:"POST",
-        data:{
-            fname:fullname,
-        },
-        success:editns.success
-    });
+    postAction("/mkdir",{fname:fullname});
 }
 
 function addFile(caller){ 
@@ -219,54 +223,10 @@ function addFile(caller){
     }
     var fullname = foldns.fname + "/" + filename
 
-    $.ajax({
-        url:"/save",
-        type:"POST",
-        data:{
-            fname:fullname,
-            fcontents:""
-        },
-        success:function(){
-            if (foldns.treepos) {
-                var nleaf = document.createElement("li");
-                nleaf.innerHTML = filename;
-                nleaf.onclick = function(){
-                    showFile(this);
-                }
-                nleaf.className = "treefile";
-                foldns.treepos.nextElementSibling.appendChild(nleaf);
+    postAction("/save",{fname:fullname,fcontents:""});
 
-            }else {
-                console.log("No treepos",foldns.treepos);
-            }
-
-            setPath(fullname);
-            showFile(nleaf);
-
-        },
-        error:editns.error
-    });
 }
 
-function postDelete(fname){
-    $.ajax({
-        url:"/delete",
-        type:"POST",
-        data:{
-            fname:fname,
-        },
-        success:function(){
-            showError("Deleted: " + fname,true);
-            console.log("Deleting : ", foldns.treepos);
-            foldns.treepos.remove();
-        },
-        error :function(resp){
-            showError("Could not delete " + fname + ":" + resp.responseText);
-            console.log(resp);
-        }
-
-    });
-}
 
 function deleteFolder(caller){
     ans = window.prompt("Delete whole folder: Are you sure? Please confirm by typing the full path of the folder you wish to delete.'"+foldns.fname+"'");
@@ -277,7 +237,7 @@ function deleteFolder(caller){
     if (ans !== foldns.fname){
         showError("Typed Incorrectly, not deleted: " + foldns.fname);
     }
-    postDelete(foldns.fname);
+    postAction("/delete",{fname:foldns.fname});
 }
 
 function deleteFile(caller){
@@ -285,15 +245,16 @@ function deleteFile(caller){
         showError("Delete Canceled: "+ foldns.fname); 
         return
     }
-    postDelete(foldns.fname);
+    postAction("/delete",{fname:foldns.fname});
 }
 
 function selectFile(){
     var els = document.getElementsByClassName("with_select");
     for (var el in els){
         if (els[el].classList) {
-        els[el].classList.remove("hidden");
+            els[el].classList.remove("hidden");
         }
+        
     }
     foldns.selectfname = foldns.fname;
     foldns.selectpos = foldns.treepos;
@@ -316,7 +277,7 @@ function deselectFile(){
 function getPath(treeitem){
     var path = treeitem.innerHTML;
     while(true){
-        paritem = filePar(treeitem); 
+        paritem = treeview.par(treeitem); 
         if (! paritem) {
             return path;
         }
@@ -328,77 +289,15 @@ function getPath(treeitem){
     }
 }
 
-function filePar(pfile) {
-    var paritem = pfile.parentNode.previousElementSibling;
-    if (!paritem) {
-        return undefined;
-    }
-    if (paritem.nodeName !== "LI") {
-        return undefined;
-    }
-    return paritem;
-}
 
-function fileChild(pfile,childname) {
-    plist = pfile.nextElementSibling;
-    var cn = plist.children;
-    if (!cn) {
-        return undefined;
-    }
-    if (cn.nodeName !== "UL") {
-        return undefined;
-    }
-    for ( var i = 0; i < cn.length; i++) {
-        if (childname == cn[i].innerHTML) {
-            return cn[i];
-        }
-    }
-}
 
-function descend(path){
-    var root = document.getElementById("treetop");
-    var curr = root;
-    ps = path.split("/");
-    for (var i =0 ; i < ps.length; i++ ) {
-        if (i ==0 && ps[i] === "" ) continue;
-        curr = fileChild(curr,ps[i]);
-        if (!curr) {
-            return undefined;
-        }
-    }
-    return curr;
-    
-}
 
 function moveHere(caller){
     
     newpath = foldns.fname + "/" + foldns.selectfname.split('/').pop();
     console.log("Moving file to " + newpath);
     
-    $.ajax({
-        url:"/move",
-        type:"POST",
-        data:{
-            fname:foldns.selectfname,
-            tname:newpath
-        },
-        success:function(data){
-            console.log("Moving: " ,data);
-            if (foldns.treepos && foldns.selectpos){
-                var chids = foldns.selectpos.nextElementSibling;
-                var newloc = foldns.treepos.nextElementSibling;
-                newloc.appendChild(foldns.selectpos)
-                if (chids ) if (chids.nodeName == "UL") { // if if for order
-                    newloc.appendChild(chids); 
-                }
-            }
-            deselectFile();
-        },
-        error:function(data){
-            showError("ERROR:" +data);
-        }
-
-    });
+    postAction("/move",{fname:foldns.selectfname,tname:newpath});
 }
 
 function rename(caller){
@@ -416,25 +315,6 @@ function rename(caller){
     var pathonly = fpath.substring(0,fpath.lastIndexOf("/"));
     console.log(",Pathonly : " ,pathonly);
 
-
-    $.ajax({
-        url:"/move",
-        type:"POST",
-        data:{
-            fname:fpath,
-            tname:pathonly + "/" +tname,
-        },
-        success:function(data){
-            console.log("Moving: " ,data);
-            if (foldns.treepos){
-                foldns.treepos.innerHTML = tname;
-            }
-            deselectFile();
-        },
-        error:function(data){
-            showError("ERROR:" +data);
-        }
-    });
-
+    postAction("/move",{fname:fpath,tname:pathonly + "/" + tname});
     
 }

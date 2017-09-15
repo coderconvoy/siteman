@@ -99,7 +99,7 @@ func FileDeleter(u usr.Usr, w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Could not Delete File: "+err.Error(), 400)
 			return
 		}
-		WriteEdits(w, []Edit{{"rm", p2}, {"say", "Permanently Deleted: " + p2}}...)
+		WriteEdits(w, NewEdit("rm", p), NewEdit("say", "Permanently Deleted: "+p))
 		return
 	}
 
@@ -117,6 +117,9 @@ func FileDeleter(u usr.Usr, w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Could not move to trash"+err.Error(), 400)
 		return
 	}
+
+	bn := path.Base(p)
+	WriteEdits(w, NewEdit("mkdir", "trash"), NewEdit("mv", p, path.Join("/trash/", bn)), NewEdit("say", p+" moved to trash"))
 }
 
 func Mkdir(u usr.Usr, w http.ResponseWriter, r *http.Request) {
@@ -133,6 +136,8 @@ func Mkdir(u usr.Usr, w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Could not Create directory: "+err.Error(), 400)
 		return
 	}
+
+	WriteEdits(w, NewEdit("mkdir", p))
 
 }
 
@@ -166,6 +171,8 @@ func FileMover(u usr.Usr, w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Could not Move File: "+s, 400)
 		return
 	}
+
+	WriteEdits(w, NewEdit("mv", fpath, tpath), NewEdit("say", "Moved"))
 
 }
 

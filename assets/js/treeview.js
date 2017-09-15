@@ -33,13 +33,16 @@ treeview.par = function(pfile) {
 
 treeview.child = function(pfile,childname) {
     plist = pfile.nextElementSibling;
-    var cn = plist.children;
-    if (!cn) {
-        console.log("no children", plist);
-        return undefined;
+    if (!plist) {
+        console.log("No next sibling:",pfile);
     }
     if (plist.nodeName !== "UL") {
         console.log("not UL", plist, plist.nodeName); 
+        return undefined;
+    }
+    var cn = plist.children;
+    if (!cn) {
+        console.log("no children", plist);
         return undefined;
     }
     for ( var i = 0; i < cn.length; i++) {
@@ -71,7 +74,7 @@ treeview.addChildOb = function(pfile,ob){
 }
 
 treeview.addChildFile = function(pfile,cname,clickf){
-    var nleaf = document.CreateElement("li");
+    var nleaf = document.createElement("li");
     nleaf.innerHTML = cname;
     nleaf.onclick = function(){
         clickf(this);
@@ -85,16 +88,16 @@ treeview.addChildFile = function(pfile,cname,clickf){
 }
 
 treeview.addChildFolder = function(pfile,cname,clickf){
-    var nleaf = document.CreateElement("li");
+    var nleaf = document.createElement("li");
     nleaf.innerHTML = cname;
     nleaf.onclick = function(){
         clickf(this);
     }
     nleaf.className = "treefolder";
 
-    var nconts = docuent.CreateElement("ul");
+    var nconts = document.createElement("ul");
 
-    if (treeview.addFileOb(pfile,[nleaf,nconts]) ){
+    if (treeview.addChildOb(pfile,[nleaf,nconts]) ){
         return nleaf;
     }
     return undefined;

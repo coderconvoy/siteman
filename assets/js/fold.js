@@ -3,6 +3,8 @@
 foldns = {};
 editns = {} ;
 
+debug = false;
+
 //Use as Callback for ajax edit errors
 editns.error = function(resp) {
     showError("Edit Error: " + resp.responseText);
@@ -13,6 +15,7 @@ editns.success = function(data){
     //Coming: Go through responses from server and enact basic operations
     for ( p in data) {
         var pp = data[p].Params;
+        if (debug) showError(data[p].Op +":"+ pp,true);
         switch (data[p].Op.toLowerCase()) {
             case "say":
                 showError(pp,true);
@@ -30,7 +33,7 @@ editns.success = function(data){
                 editns.newFile(pp);
                 break;
             case "mv" : 
-                editns.mv(pp);
+                editns.mv.apply(editns,pp.split(","));
                 break;
             default :
                 showError("Unknown operation: " + data[p].Op);
@@ -51,13 +54,13 @@ editns.mkdirs = function(names) {
 editns.mkdir = function(fname) {
     var pp = fname.split("/");
 
-    curr = document.getElementById("treetop");
+    curr = treeview.root(); 
     for (p in pp ){
         if (p == 0  && pp[0] == "") continue;
 
-        var n = treeview.child(pp[p]);
+        var n = treeview.child(curr,pp[p]);
         if (!n ){
-            n = treeview.addChildFolder(curr,pp[p])   
+            n = treeview.addChildFolder(curr,pp[p],fold)   
             if (!n){
                 showError("UI: Could not add child to " + curr.innerHTML);
                 return undefined;
@@ -85,16 +88,22 @@ editns.newFiles = function(fname){
 
 editns.rm = function(fname){
     node = treeview.descend(fname);
+    if (!node) {
+        showError("Could not remove :" + fname + " : File not found");
+        return
+    }
     treeview.remove(node);
 }
 
 editns.mv = function(fname,tname){
     var node = treeview.descend(fname);
-    blocks = treeview.remove(node);
+    if (!node) showError("File not found for move : " + fname);
+    var blocks = treeview.remove(node);
     console.log(blocks);
     node.innerHTML = tname.split("/").pop();
     
     newloc = tname.substring(0,tname.lastIndexOf("/"));
+    if (debug) showError("newloc = " + newloc,true);
     newpar = treeview.descend(newloc);
     treeview.addChildOb(newpar,blocks);
 

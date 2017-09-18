@@ -30,7 +30,7 @@ editns.success = function(data){
                 editns.mkdirs(pp);
                 break;
             case "new" :
-                editns.newFile(pp);
+                editns.newFiles(pp);
                 break;
             case "mv" : 
                 editns.mv.apply(editns,pp.split(","));
@@ -40,8 +40,6 @@ editns.success = function(data){
                 break;
         }
     }
-
-
 }
 
 editns.mkdirs = function(names) {
@@ -73,12 +71,13 @@ editns.mkdir = function(fname) {
 
 
 editns.newFiles = function(fname){
+    console.log("newFiles: fname == " , fname);
     var ffs = fname.split(",");
     var res = undefined;
     for (p in ffs) {
         var path = ffs[p].split("/");
         var base = path.splice(-1,1);
-        var pnode = editns.mkdir(path);
+        var pnode = editns.mkdir(path.join("/"));
         if (pnode) {
             res = treeview.addChildFile(pnode,base,showFile);
         }
@@ -198,12 +197,15 @@ function showFile(caller){
     console.log("Loading-" + fname)
 }
 
-function postAction(url,data){
+function postAction(url,data,callback){
+    if (!callback){
+        callback = editns.success;
+    }
     $.ajax({
         url:url,
         type:"POST",
         data:data,
-        success:editns.success,
+        success:callback,
         error:editns.error
     });
 }
@@ -232,8 +234,7 @@ function addFile(caller){
     }
     var fullname = foldns.fname + "/" + filename
 
-    postAction("/save",{fname:fullname,fcontents:""});
-
+    postAction("/newfile",{fname:fullname,fcontents:""});
 }
 
 

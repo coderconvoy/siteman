@@ -81,6 +81,21 @@ func FileSaver(u usr.Usr, w http.ResponseWriter, r *http.Request) {
 	WriteEdits(w, NewEdit("say", "File Saved : "+p))
 }
 
+func FileCreator(u usr.Usr, w http.ResponseWriter, r *http.Request) {
+	p := strings.TrimSpace(r.FormValue("fname"))
+	if p == "" {
+		http.Error(w, "No Filename given", 400)
+		return
+	}
+	p2, err := u.ConvertPath(p)
+	if err != nil {
+		http.Error(w, "Could not write file: "+err.Error(), 400)
+		return
+	}
+	ioutil.WriteFile(p2, []byte(r.FormValue("fcontents")), 0777)
+	WriteEdits(w, NewEdit("new", p), NewEdit("say", "File Created : "+p))
+}
+
 func FileDeleter(u usr.Usr, w http.ResponseWriter, r *http.Request) {
 	p := strings.TrimSpace(r.FormValue("fname"))
 	if p == "" {

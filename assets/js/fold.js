@@ -1,6 +1,8 @@
 //Depends on treeview.js
 
-foldns = {};
+foldns = {
+    changed:false
+};
 editns = {} ;
 
 debug = false;
@@ -17,6 +19,9 @@ editns.success = function(data){
         var pp = data[p].Params;
         if (debug) showError(data[p].Op +":"+ pp,true);
         switch (data[p].Op.toLowerCase()) {
+            case "unchange":
+                foldns.changed = false;
+                break;
             case "say":
                 showError(pp,true);
                 break;
@@ -82,6 +87,7 @@ editns.newFiles = function(fname){
             res = treeview.addChildFile(pnode,base,showFile);
         }
     }
+    showFile(res,true);
     return res;
 }
 
@@ -137,6 +143,11 @@ function setPath(p,treepos){
 }
 
 function fold(caller){
+    if (foldns.changed ){
+        if (! confirm(foldns.fname +" has been changed. Leave anyway?")){
+            return;
+        }
+    }
     fpath = getPath(caller);
     console.log("Caller path:" + fpath);
     document.getElementById("foldiv").style.display = "";
@@ -170,7 +181,12 @@ function isIMG(fname){
 }
 
 
-function showFile(caller){
+function showFile(caller,override){
+    if (foldns.changed && (!override)){
+        if (! confirm(foldns.fname + " has been changed. Leave it anyway?")){
+            return;
+        }
+    }
     var fname = getPath(caller);
     console.log("showFile: " , fname);
     document.getElementById("foldiv").style.display = "none";
@@ -192,6 +208,8 @@ function showFile(caller){
         box.value = "--LOADING--";
         $.get("/usr/"+fname,function(res){
             box.value = res ;
+            foldns.changed = false;
+            box.onchange = function(){foldns.changed = true;};
         });
     }
     console.log("Loading-" + fname)

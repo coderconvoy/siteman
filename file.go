@@ -78,7 +78,7 @@ func FileSaver(u usr.Usr, w http.ResponseWriter, r *http.Request) {
 	}
 	ioutil.WriteFile(p2, []byte(r.FormValue("fcontents")), 0777)
 
-	WriteEdits(w, NewEdit("say", "File Saved : "+p))
+	WriteEdits(w, NewEdit("say", "File Saved : "+p), NewEdit("unchange"))
 }
 
 func FileCreator(u usr.Usr, w http.ResponseWriter, r *http.Request) {

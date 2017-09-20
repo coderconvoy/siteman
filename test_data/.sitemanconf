@@ -1,2 +1,3 @@
 config
+    userfile:test_data/usrdata.json
     insec:true

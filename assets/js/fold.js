@@ -183,7 +183,7 @@ function isIMG(fname){
 
 function showFile(caller,override){
     if (foldns.changed && (!override)){
-        if (! confirm(foldns.fname + " has been changed. Leave it anyway?")){
+        if (! confirm(foldns.fname + " has been changed. Leave it without saving?")){
             return;
         }
     }
@@ -201,6 +201,15 @@ function showFile(caller,override){
     if (isIMG(fpath)) {
         pic.classList.remove("hidden");
         box.classList.add("hidden");
+        var ntbut = document.getElementById("pictabber");
+        ntbut.classList.add("hidden");
+        $(pic).on('error',function(err){
+            console.log("Error loading image:" , err);
+            ntbut.classList.remove("hidden");
+            ntbut.onclick = function(){
+                window.open("/view/" + fname, "_blank");
+            }
+        });
         pic.src = fpath;
     }else {
         pic.classList.add("hidden");

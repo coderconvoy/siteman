@@ -3,6 +3,7 @@ package main
 import (
 	"io"
 	"io/ioutil"
+	"mime"
 	"net/http"
 	"os"
 	"path"
@@ -51,18 +52,38 @@ func FileView(root, lpath string, md int) (*htmq.Tag, error) {
 }
 
 func FileGetter(u usr.Usr, w http.ResponseWriter, r *http.Request) {
+	var maxSize int64 = 10000 //
 	p := strings.TrimPrefix(r.URL.Path, "/usr/")
+
+	if strings.HasPrefix(r.URL.Path, "/view/") {
+		maxSize *= 1000
+		p = strings.TrimPrefix(r.URL.Path, "/view/")
+	}
+
 	p2, err := u.ConvertPath(p)
 	if err != nil {
 		http.Error(w, "Could not access file by that name"+err.Error(), 400)
 		return
 	}
-	cc, err := ioutil.ReadFile(p2)
+	f, err := os.Open(p2)
 	if err != nil {
 		http.Error(w, "Could not read file: "+err.Error(), 400)
 		return
 	}
-	w.Write(cc)
+	defer f.Close()
+
+	finfo, err := f.Stat()
+	if err != nil {
+		http.Error(w, "Could not get file Size: "+err.Error(), 400)
+		return
+	}
+	if finfo.Size() > maxSize {
+		http.Error(w, "big file", 400)
+		return
+	}
+
+	w.Header().Set("Content-Type", mime.TypeByExtension(path.Ext(p)))
+	io.Copy(w, f)
 }
 
 func FileSaver(u usr.Usr, w http.ResponseWriter, r *http.Request) {

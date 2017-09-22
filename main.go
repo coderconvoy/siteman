@@ -103,6 +103,7 @@ func main() {
 	http.HandleFunc("/login", LoginHandler(users, sesh))
 	http.HandleFunc("/logout", LogoutHandler(users, sesh))
 	http.HandleFunc("/usr/", NewHandler(users, sesh, FileGetter))
+	http.HandleFunc("/view/", NewHandler(users, sesh, FileGetter))
 	http.HandleFunc("/tabusr/", NewHandler(users, sesh, FileGetter))
 	http.HandleFunc("/", Handle)
 

@@ -47,7 +47,7 @@ func HomeView(u usr.Usr, w http.ResponseWriter, r *http.Request) {
 		htmq.NewTag("textarea", "id", "filebox"),
 		htmq.NewTag("img", "id", "fileimg", "class", "hidden"),
 		htmq.NewText("<br>"),
-		htmq.QBut("Big file: Open in new tab", "", "class", "hidden", "id", "pictabber"),
+		htmq.QBut("Big file: Open anyway?", "", "class", "hidden", "id", "pictabber"),
 		htmq.NewParent("div", []*htmq.Tag{
 			htmq.QBut("Delete", "deleteFile(this)"),
 			htmq.QBut("Save", "saveFile(this)"),

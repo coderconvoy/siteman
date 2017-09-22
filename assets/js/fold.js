@@ -207,7 +207,8 @@ function showFile(caller,override){
             console.log("Error loading image:" , err);
             ntbut.classList.remove("hidden");
             ntbut.onclick = function(){
-                window.open("/view/" + fname, "_blank");
+                pic.src = "/view/" + fname;
+                ntbut.classList.add("hidden");
             }
         });
         pic.src = fpath;

@@ -50,7 +50,6 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	usrn := flag.Bool("usr", false, "Create or Edit a User")
 	usrf := flag.String("usrf", "", "Set Userdata file")
 	insec := flag.Bool("i", false, "Run insecure")
 	noconf := flag.Bool("noconf", false, "Use Default Configuration")
@@ -76,11 +75,6 @@ func main() {
 		usrloc = lazyf.EnvReplace(loc)
 	}
 	fmt.Println("Userfile at :" + usrloc)
-
-	if *usrn {
-		usr.RunUserFunc(usrloc)
-		return
-	}
 
 	users, err := usr.LoadUsers(usrloc)
 	if err != nil {
@@ -120,5 +114,4 @@ func main() {
 	secPort := conf.PStringD("8091", "port")
 
 	log.Fatal(http.ListenAndServeTLS(":"+secPort, pubkey, privkey, nil))
-
 }

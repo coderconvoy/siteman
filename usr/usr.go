@@ -13,11 +13,21 @@ import (
 	"github.com/pkg/errors"
 )
 
+const (
+	CAN_EDIT = iota
+	CAN_READ
+	NO_READ
+)
+
+type pathOption struct {
+	Mode int
+}
+
 type Usr struct {
 	Username string
 	Password dbase.Password
 	Root     string
-	Edit     string
+	Options  []pathMode
 }
 
 func absPath(uu []Usr, fpath string) []Usr {

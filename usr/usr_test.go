@@ -2,17 +2,24 @@ package usr
 
 import (
 	"testing"
-
-	"github.com/coderconvoy/dbase"
 )
 
-func Test_User(t *testing.T) {
-	tdat := []Usr{
-		{"Alice", dbase.Password{}, "/lo", "/pop"},
+func t_permission(t *testing.T, u Usr, p string, exp int) {
+	r := u.Permission(p)
+	if r != exp {
+		t.Errorf("Permission test: %s,%s. exp %d, got %d", u.Username, p, exp, r)
 	}
-	t2 := absPath(tdat, "/poop")
-	if t2[0].Root != "/poop/lo" {
-		t.Errorf("Expected /poop/lo, got %s", t2[0].Root)
+}
+
+func TestPermission(t *testing.T) {
+	u := Usr{
+		Username: "NoLog",
+		Paths: map[string]int{
+			"/logs/": CAN_READ,
+		},
 	}
+
+	t_permission(t, u, "/logs", CAN_EDIT)
+	t_permission(t, u, "/logs/hello", CAN_READ)
 
 }

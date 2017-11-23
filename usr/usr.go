@@ -2,6 +2,7 @@ package usr
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"path"
 	"path/filepath"
@@ -90,9 +91,26 @@ func (u Usr) ConvertPath(p string) (string, error) {
 }
 
 func LoadUsers(fname string) ([]Usr, error) {
-	uu, err := ReadUsers(fname)
+	ulist, _, err := lazyf.GetConfig(fname)
+	if err != nil {
+		return []Usr{}, err
+	}
+
+	if len(ulist) == 0 {
+		return []Usr{}, errors.Errorf("No users in userfile")
+	}
+	res := []Usr{}
+	for _, v := range ulist {
+		u, err := Load(v)
+		if err != nil {
+			//TODO, add logger
+			fmt.Println(err)
+			continue
+		}
+		res = append(res, u)
+	}
 	fpath := filepath.Dir(fname)
-	return absPath(uu, fpath), err
+	return absPath(res, fpath), nil
 }
 
 func ReadUsers(fname string) ([]Usr, error) {
@@ -110,16 +128,13 @@ func ReadUsers(fname string) ([]Usr, error) {
 	return res, nil
 }
 
-func WriteUsers(fname string, u []Usr) error {
-	d, err := json.Marshal(u)
-	if err != nil {
-		return errors.Wrap(err, "Could not marshal Data")
+func (u Usr) GlobalPermission(fname string) int {
+	if !strings.HasPrefix(fname, u.Root) {
+		return NO_READ
 	}
-	err = ioutil.WriteFile(fname, d, 0777)
-	if err != nil {
-		return errors.Wrap(err, "Could not save")
-	}
-	return nil
+	tr := strings.TrimPrefix(fname, u.Root)
+	return u.Permission(tr)
+
 }
 
 func (u Usr) Permission(fname string) int {

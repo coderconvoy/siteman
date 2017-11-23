@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -50,36 +49,27 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	usrf := flag.String("usrf", "", "Set Userdata file")
-	insec := flag.Bool("i", false, "Run insecure")
-	noconf := flag.Bool("noconf", false, "Use Default Configuration")
-	confloc := flag.String("config", "", "Config File Location")
+	//Underscores are for flag pointers here
+	_usrf := lazyf.FlagString("usrf", "userfile", "{HOME}/.config/users", "Set Userdata file")
+	_insec := lazyf.FlagBool("i", "insec", "Run Insecure")
+	_port := lazyf.FlagString("p", "port", "8081", "Port to run through")
+	_pubkey := lazyf.FlagString("pub", "pubkey", "", "Location of public key")
+	_privkey := lazyf.FlagString("priv", "privkey", "", "Location of private key")
 
-	flag.Parse()
+	lazyf.FlagLoad("c", "{HOME}/.config/init")
 
-	conf, err := getConfig(*confloc, *noconf)
+	if *_usrf == "" {
+		log.Fatal("No Users Cannot run without users")
+	}
+
+	users, err := usr.LoadUsers(*_usrf)
 	if err != nil {
-		fmt.Println("Config Error:", err)
-		return
-	}
-	//Testing map
-	fmt.Println("Config")
-	for k, v := range conf.Deets {
-		fmt.Println("\t", k, ":", v)
+		fmt.Println("No USers err")
+		log.Fatal(err)
 	}
 
-	usrloc := *usrf
-	if *usrf == "" {
-		loc := conf.PStringD("usrdata.json", "userfile")
-		fmt.Println("userfile == ", loc)
-		usrloc = lazyf.EnvReplace(loc)
-	}
-	fmt.Println("Userfile at :" + usrloc)
-
-	users, err := usr.LoadUsers(usrloc)
-	if err != nil {
-		fmt.Println(err)
-		return
+	for _, v := range users {
+		fmt.Printf("USR,%s,%s\n", v.Username, v.Root)
 	}
 
 	sesh := dbase.NewSessionControl(time.Minute * 15)
@@ -103,15 +93,10 @@ func main() {
 
 	fmt.Println("Starting Server")
 
-	if *insec || conf.PBoolD(false, "insec", "insecure") {
+	if *_insec {
 		//Run without https
-		insPort := conf.PStringD("8090", "ins-port")
-		log.Fatal(http.ListenAndServe(":"+insPort, nil))
+		log.Fatal(http.ListenAndServe("localhost:"+*_port, nil))
 	}
 
-	pubkey := conf.PStringD("data/server.pub", "pubkey")
-	privkey := conf.PStringD("data/server.key", "privkey")
-	secPort := conf.PStringD("8091", "port")
-
-	log.Fatal(http.ListenAndServeTLS(":"+secPort, pubkey, privkey, nil))
+	log.Fatal(http.ListenAndServeTLS(":"+*_port, *_pubkey, *_privkey, nil))
 }

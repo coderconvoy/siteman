@@ -60,7 +60,7 @@ func FileGetter(u usr.Usr, w http.ResponseWriter, r *http.Request) {
 		p = strings.TrimPrefix(r.URL.Path, "/view/")
 	}
 
-	p2, err := u.ConvertPath(p)
+	p2, err := u.ConvertPath(p, usr.CAN_READ)
 	if err != nil {
 		http.Error(w, "Could not access file by that name"+err.Error(), 400)
 		return
@@ -92,7 +92,7 @@ func FileSaver(u usr.Usr, w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "No Filename given", 400)
 		return
 	}
-	p2, err := u.ConvertPath(p)
+	p2, err := u.ConvertPath(p, usr.CAN_EDIT)
 	if err != nil {
 		http.Error(w, "Could not write file: "+err.Error(), 400)
 		return
@@ -108,7 +108,7 @@ func FileCreator(u usr.Usr, w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "No Filename given", 400)
 		return
 	}
-	p2, err := u.ConvertPath(p)
+	p2, err := u.ConvertPath(p, usr.CAN_EDIT)
 	if err != nil {
 		http.Error(w, "Could not write file: "+err.Error(), 400)
 		return
@@ -123,7 +123,7 @@ func FileDeleter(u usr.Usr, w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "No Filename given", 400)
 		return
 	}
-	p2, err := u.ConvertPath(p)
+	p2, err := u.ConvertPath(p, usr.CAN_EDIT)
 	if err != nil {
 		http.Error(w, "Could not Delete File: "+err.Error(), 400)
 		return
@@ -161,7 +161,7 @@ func FileDeleter(u usr.Usr, w http.ResponseWriter, r *http.Request) {
 func Mkdir(u usr.Usr, w http.ResponseWriter, r *http.Request) {
 	p := strings.TrimSpace(r.FormValue("fname"))
 
-	path, err := u.ConvertPath(p)
+	path, err := u.ConvertPath(p, usr.CAN_EDIT)
 	if err != nil {
 		http.Error(w, "Could not create directory: "+err.Error(), 400)
 		return
@@ -189,13 +189,13 @@ func FileMover(u usr.Usr, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sfrom, err := u.ConvertPath(fpath)
+	sfrom, err := u.ConvertPath(fpath, usr.CAN_EDIT)
 	if err != nil {
 		http.Error(w, "Could not Move File: "+err.Error(), 400)
 		return
 	}
 
-	sto, err := u.ConvertPath(tpath)
+	sto, err := u.ConvertPath(tpath, usr.CAN_EDIT)
 	if err != nil {
 		http.Error(w, "Could not Move File: "+err.Error(), 400)
 		return
@@ -233,7 +233,7 @@ func FileUploader(u usr.Usr, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	uppath, err := u.ConvertPath(fup)
+	uppath, err := u.ConvertPath(fup, usr.CAN_EDIT)
 	if err != nil {
 		http.Error(w, "Upload Error: "+err.Error(), 400)
 		return

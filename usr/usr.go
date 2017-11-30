@@ -82,11 +82,16 @@ func absPath(uu []Usr, fpath string) []Usr {
 	return res
 }
 
-func (u Usr) ConvertPath(p string) (string, error) {
+func (u Usr) ConvertPath(p string, reqPerm int) (string, error) {
 	fp := path.Join(u.Root, p)
 	if !strings.HasPrefix(fp, u.Root) {
 		return u.Root, errors.New("Cannot reach outside Root folder")
 	}
+	perm := u.Permission(p)
+	if perm > reqPerm {
+		return u.Root, errors.Errorf("Permision = %d, requires %d", perm, reqPerm)
+	}
+
 	return fp, nil
 }
 

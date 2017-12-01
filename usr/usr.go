@@ -142,14 +142,29 @@ func (u Usr) GlobalPermission(fname string) int {
 
 }
 
+//Permission decides whether a user has permission to access a file, depending on a set of paths.
+//It always answers the permission of the longest path that matches it's criteria
 func (u Usr) Permission(fname string) int {
+	if len(fname) == 0 {
+		return NO_READ
+	}
+	if fname[0] != '/' {
+		fname = "/" + fname
+	}
+
 	longest := ""
 	res := CAN_EDIT
 	for k, v := range u.Paths {
+		if k == fname {
+			return v
+		}
 		if len(k) <= len(longest) {
 			continue
 		}
 		if !strings.HasPrefix(fname, k) {
+			continue
+		}
+		if k[len(k)-1] != '/' && fname[len(k)] != '/' {
 			continue
 		}
 		longest = k

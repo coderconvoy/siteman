@@ -15,11 +15,18 @@ func TestPermission(t *testing.T) {
 	u := Usr{
 		Username: "NoLog",
 		Paths: map[string]int{
-			"/logs/": CAN_READ,
+			"/logs": CAN_READ,
+			"":      NO_READ,
 		},
 	}
 
-	t_permission(t, u, "/logs", CAN_EDIT)
+	t_permission(t, u, "/logstik", CAN_EDIT)
+	t_permission(t, u, "/logstik/poo", CAN_EDIT)
+	t_permission(t, u, "/logs", CAN_READ)
 	t_permission(t, u, "/logs/hello", CAN_READ)
+	t_permission(t, u, "logstik", CAN_EDIT)
+	t_permission(t, u, "logstik/poo", CAN_EDIT)
+	t_permission(t, u, "logs", CAN_READ)
+	t_permission(t, u, "logs/hello", CAN_READ)
 
 }

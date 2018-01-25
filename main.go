@@ -50,11 +50,11 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	//Underscores are for flag pointers here
-	_usrf := lazyf.FlagString("usrf", "userfile", "{HOME}/.config/users", "Set Userdata file")
+	_usrf := lazyf.FlagString("usrf", "{HOME}/.config/users", "userfile", "Set Userdata file")
 	_insec := lazyf.FlagBool("i", "insec", "Run Insecure")
-	_port := lazyf.FlagString("p", "port", "8081", "Port to run through")
-	_pubkey := lazyf.FlagString("pub", "pubkey", "", "Location of public key")
-	_privkey := lazyf.FlagString("priv", "privkey", "", "Location of private key")
+	_port := lazyf.FlagString("p", "8081", "port", "Port to run through")
+	_pubkey := lazyf.FlagString("pub", "", "pubkey", "Location of public key")
+	_privkey := lazyf.FlagString("priv", "", "privkey", "Location of private key")
 
 	lazyf.FlagLoad("c", "{HOME}/.config/init")
 
